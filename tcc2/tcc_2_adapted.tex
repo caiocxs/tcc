@@ -273,10 +273,12 @@ TP   & \textit{True Positive} (Verdadeiros Positivos) \\
 \par
 \novo{Para dimensionar o problema tratado neste trabalho, basta observar o que acontece quando uma falha de \textit{software} passa despercebida.
 Em 2014, a ausência de uma única verificação de tamanho em uma rotina de manipulação de memória da biblioteca OpenSSL, escrita em C e utilizada para proteger a comunicação de grande parte dos \textit{sites} da internet, deu origem à vulnerabilidade conhecida como \textit{Heartbleed} (CVE-2014-0160).
-A falha permitia que qualquer pessoa lesse trechos da memória dos servidores afetados, expondo senhas, dados pessoais e chaves criptográficas, e atingiu uma parcela expressiva dos servidores HTTPS mais acessados do mundo \cite{durumeric2014heartbleed}.}
+A falha permitia que qualquer pessoa lesse trechos da memória dos servidores afetados, expondo senhas, dados pessoais e chaves criptográficas.
+Estima-se que, no momento da divulgação, entre 24\% e 55\% dos servidores HTTPS do milhão de \textit{sites} mais acessados do mundo estavam vulneráveis \cite{durumeric2014heartbleed}.}
 \par
 \novo{Esse caso não é isolado.
-A Microsoft relata que cerca de 70\% das vulnerabilidades corrigidas anualmente em seus produtos são problemas de segurança de memória \cite{msrc2019proactive}, e a equipe do navegador Chromium, do Google, aponta proporção semelhante entre as suas falhas de alta severidade, sendo metade delas do tipo uso de memória após a sua liberação \cite{chromium2020memorysafety}.
+A Microsoft relata que cerca de 70\% das vulnerabilidades de seus produtos às quais atribui um CVE a cada ano são problemas de segurança de memória \cite{msrc2019proactive}.
+A equipe do navegador Chromium, do Google, chegou a uma proporção semelhante ao analisar 912 falhas de severidade alta ou crítica registradas desde 2015: cerca de 70\% eram problemas de segurança de memória, e metade destas, do tipo uso de memória após a sua liberação \cite{chromium2020memorysafety}.
 Em linguagens como C, o programador é responsável por reservar e devolver manualmente a memória utilizada.
 Esquecer de liberá-la (vazamento de memória), liberá-la duas vezes ou continuar usando um endereço já liberado são erros simples de cometer e difíceis de perceber, mas que podem travar sistemas inteiros ou permitir que um invasor execute código malicioso.
 Essas falhas, catalogadas e detalhadas na Seção \ref{sec:cwes}, constituem o foco deste trabalho.}
