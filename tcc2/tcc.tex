@@ -1,10 +1,10 @@
 % ---------------------------------------------------------------
-% TEMPLATE TCC1 - SENAC SANTO AMARO
+% TEMPLATE TCC2 - SENAC SANTO AMARO
 % ---------------------------------------------------------------
-% Trabalho de Conclusão de Curso 1
-% Elaborado para apresentação da proposta inicial do TCC
-% Estrutura: 4 capítulos (Introdução, Revisão Bibliográfica,
-%            Desenvolvimento, Referências Bibliográficas)
+% Trabalho de Conclusão de Curso 2
+% Elaborado para apresentação do trabalho final do TCC
+% Estrutura: Introdução, Revisão Bibliográfica, Metodologia,
+%            Desenvolvimento, Resultados e Análise, Conclusão
 % ---------------------------------------------------------------
 
 \documentclass[
@@ -17,7 +17,7 @@
 ]{abntex2}
 
 % ---------------------------------------------------------------
-% PACOTES
+% PACOTES 
 % ---------------------------------------------------------------
 \usepackage{lmodern}                % Fonte Latin Modern
 \usepackage[T1]{fontenc}            % Seleção de códigos de fonte
@@ -43,9 +43,9 @@
 \hypersetup{
     pdftitle={\@title},
     pdfauthor={\@author},
-    pdfsubject={TCC1 - SENAC Santo Amaro},
+    pdfsubject={TCC2 - SENAC Santo Amaro},
     pdfcreator={LaTeX with abnTeX2},
-    pdfkeywords={tcc}{senac}{santo amaro}{trabalho de conclusão},
+    pdfkeywords={tcc2}{senac}{santo amaro}{trabalho de conclusão},
     colorlinks=true,        % false: links em caixas; true: links coloridos
     linkcolor=blue,         % cor dos links internos
     citecolor=blue,         % cor dos links para bibliografia
@@ -59,6 +59,34 @@
 % CONFIGURAÇÕES DE APARÊNCIA DO PDF FINAL
 % ---------------------------------------------------------------
 \definecolor{blue}{RGB}{41,5,195}
+
+% ---------------------------------------------------------------
+% TAMANHO DA FONTE DAS LEGENDAS (ABNT) -- 10 pt
+% ---------------------------------------------------------------
+% O título (\caption) e a linha de fonte (\legend) de figuras e
+% tabelas devem ficar em 10 pt (o corpo do texto é 12 pt). Por
+% padrão o memoir/abntex2 deixa essas legendas em 12 pt; os comandos
+% abaixo reduzem o título e a fonte para 10 pt.
+\renewcommand{\ABNTEXfontereduzida}{\fontsize{10}{12}\selectfont}
+\captionnamefont{\ABNTEXfontereduzida}   % rótulo "Figura N"/"Tabela N"
+\captiontitlefont{\ABNTEXfontereduzida}  % texto do título da legenda
+\makeatletter
+% Redefine \legend (usado em "Fonte: ...") para sair em 10 pt
+% (a definição original do memoir fixa \normalsize = 12 pt).
+\renewcommand{\legend}[1]{%
+  \M@gettitle{#1}%
+  \memlegendinfo{#1}%
+  \par
+  \begingroup
+    \@parboxrestore
+    \if@minipage
+      \@setminipage
+    \fi
+    \ABNTEXfontereduzida
+    \captiondelim{\mbox{}}%
+    \@makecaption{}{\ignorespaces #1}\par
+  \endgroup}
+\makeatother
 
 % ---------------------------------------------------------------
 % INFORMAÇÕES DO DOCUMENTO
@@ -78,9 +106,9 @@
   Bacharelado em Ciência da Computação
 }
 
-\tipotrabalho{Trabalho de Conclusão de Curso I}
+\tipotrabalho{Trabalho de Conclusão de Curso II}
 
-\preambulo{Proposta de Trabalho de Conclusão de Curso apresentado ao SENAC Santo Amaro como requisito parcial para aprovação na disciplina de TCC1 do Bacharelado em Ciência da Computação.}
+\preambulo{Trabalho de Conclusão de Curso II apresentado ao SENAC Santo Amaro como requisito parcial para conclusão do curso de Bacharelado em Ciência da Computação.}
 
 % ---------------------------------------------------------------
 % COMPILA O ÍNDICE
@@ -127,6 +155,33 @@ A hipótese central é que este modelo automatizado apresente taxas de detecçã
 \noindent
 \textbf{Palavras-chave}: análise estática. semgrep. LLM. regras. C.
 \end{resumo}
+
+% ---------------------------------------------------------------
+% ABSTRACT (RESUMO EM LÍNGUA ESTRANGEIRA) -- OBRIGATÓRIO NO TCC2
+% ---------------------------------------------------------------
+\begin{resumo}[Abstract]
+ \begin{otherlanguage*}{english}
+
+   \vspace{\onelineskip}
+
+   \noindent
+   \textbf{Keywords}:
+ \end{otherlanguage*}
+\end{resumo}
+
+% ---------------------------------------------------------------
+% LISTA DE ILUSTRAÇÕES (FIGURAS)
+% ---------------------------------------------------------------
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures*
+\cleardoublepage
+
+% ---------------------------------------------------------------
+% LISTA DE TABELAS
+% ---------------------------------------------------------------
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables*
+\cleardoublepage
 
 % ---------------------------------------------------------------
 % LISTA DE ABREVIATURAS E SIGLAS
@@ -189,19 +244,17 @@ TP   & \textit{True Positive} (Verdadeiros Positivos) \\
 \cleardoublepage
 
 % ---------------------------------------------------------------
-% LISTA DE ILUSTRAÇÕES
-% ---------------------------------------------------------------
-\pdfbookmark[0]{\listfigurename}{lof}
-\listoffigures*
-\cleardoublepage
-
-% ---------------------------------------------------------------
 % SUMÁRIO
 % ---------------------------------------------------------------
 \pdfbookmark[0]{\contentsname}{toc}
 \tableofcontents*
 \cleardoublepage
+
+% ---------------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ---------------------------------------------------------------
 \textual
+
 % ===============================================================
 % CAPÍTULO 1 - INTRODUÇÃO
 % ===============================================================
@@ -264,15 +317,15 @@ Contudo, apesar de sua utilidade, tanto as ferramentas clássicas de detecção 
 Conforme apontado por \citeonline{hou2025generation} e \citeonline{tang2021grammar}, a eficácia destas abordagens é frequentemente limitada por sua dependência de lógica rígida, o que compromete severamente a sua extensibilidade. 
 A Tabela \ref{tab:limitacoes_analise_trad} sintetiza as principais limitações destas abordagens clássicas apontadas na literatura.
 
-\section{Contexto}
+% ---------------------------------------------------------------
+\section{Contextualização do problema}
 \label{sec:contexto}
 
 \begin{figure}[h]
     \centering
     \caption{Motivação para \textit{checkers} feitos por llms.}
     \includegraphics[width=0.55\textwidth]{Images/problemas em larga escala.png}
-    \\
-    {\small Fonte: Adaptado pelo autor para melhor compreensão \cite{yang2025knighter}}
+    \legend{Fonte: Adaptado pelo autor para melhor compreensão \cite{yang2025knighter}}
     \label{fig:motivacaocheckers}
 \end{figure}
 
@@ -306,6 +359,39 @@ Porém, dos métodos existentes, geralmente sacrificam um desses objetivos \cite
 O método apresentado por \citeonline{yang2025knighter}, KNighter, é um analisador estático sintetizado utilizando LLMs, que ao invés de métodos diretos de utilização de LLMs, é realizado um treinamento de padrões de \textit{bugs} a partir de histórico de \textit{patches} que a partir disso é dedicado para um \textit{checker} especializado.
 A partir desse paradigma, \citeonline{yang2025knighter} sobrepassa os problemas de limites de contextos e custos absurdos de analisar bases de códigos de milhões de linhas com diversos bugs.
 
+% ---------------------------------------------------------------
+\section{Formulação do problema}
+\label{sec:problema}
+
+% ---------------------------------------------------------------
+\section{Objetivos e hipótese}
+\label{sec:objetivos}
+\par
+Os objetivos desta pesquisa estruturam-se em duas frentes: o objetivo geral, focado em solucionar o problema central do estudo, e os objetivos específicos, representam os subprodutos ou detalhamentos lógicos gerados para alcançar esse propósito maior.
+
+\subsection{Objetivo geral}
+\label{sec:objgeral}
+\par
+O objetivo geral deste trabalho é demonstrar que um \textit{framework} de síntese automatizada de regras, baseando-se em Modelos de Linguagem de Larga Escala e integrado à ferramenta SemGrep, apresenta precisão e \textit{recall} estatisticamente superiores às abordagens estáticas tradicionais na detecção de vulnerabilidades críticas em linguagem C.
+Busca-se demonstrar que este modelo supera abordagens estáticas tradicionais na identificação precisa de, no mínimo, cinco categorias de vulnerabilidades de software, em inglês \textit{Common Weakness Enumeration} (CWE).
+
+\subsection{Objetivos específicos}
+\label{sec:objespecifico}
+\par
+Sobre os objetivos específicos, temos:
+
+\begin{enumerate}
+  \item Determinar os limites de detecção semântica (\textit{corner-cases}) que podem ser superados pela abordagem gerativa de LLMs em relação aos conjuntos de regras predefinidas (\textit{ruleset}) estáticos.
+  \item Estabelecer o ganho quantitativo de desempenho (\textit{Recall}, Precisão e F1-Score) de regras sintetizadas dinamicamente frente aos analisadores tradicionais do estado da arte.
+  \item Determinar a viabilidade técnica e a escalabilidade de inferência da arquitetura proposta utilizando modelos de linguagem de menor escala (com contagem reduzida de parâmetros), visando garantir a viabilidade técnica da execução do \textit{framework} em infraestruturas locais com restrições de custo e \textit{hardware}.
+\end{enumerate}
+
+\subsection{Hipótese ou critério de validação}
+\label{sec:hipotese}
+\par
+A hipótese desta pesquisa é a de que a geração automatizada de regras por meio de um \textit{framework} multi-agente baseado em LLMs, integrado ao motor do SemGrep, produzirá taxas de detecção (\textit{Recall} e \textit{F1-Score}) de vulnerabilidades (CWEs) em C estatisticamente superiores e com maior identificação de \textit{corner-cases} quando comparada aos conjuntos de regras predefinidas dos analisadores estáticos tradicionais (como por exemplo \textit{ruleset} tradicional do SemGrep).
+
+% ---------------------------------------------------------------
 \section{Justificativa}
 \label{sec:justificativa}
 \par
@@ -325,42 +411,14 @@ Ao propor um sistema especializado nas vulnerabilidades críticas (CWEs) da ling
     \centering
     \caption{Exemplo de regra criada para detectar uma senha embutida no argumento da função em Python.}
     \includegraphics[width=0.80\textwidth]{Images/Semgrep.png}
-    \\
-    {\small Fonte: Adaptado para português com finalidade de melhorar compreensão \cite{hou2025generation}.}
+    \legend{Fonte: Adaptado para português com finalidade de melhorar compreensão \cite{hou2025generation}.}
     \label{fig:semgrep}
 \end{figure}
 
-\section{Hipótese}
-\label{sec:hipotese}
-\par
-A hipótese desta pesquisa é a de que a geração automatizada de regras por meio de um \textit{framework} multi-agente baseado em LLMs, integrado ao motor do SemGrep, produzirá taxas de detecção (\textit{Recall} e \textit{F1-Score}) de vulnerabilidades (CWEs) em C estatisticamente superiores e com maior identificação de \textit{corner-cases} quando comparada aos conjuntos de regras predefinidas dos analisadores estáticos tradicionais (como por exemplo \textit{ruleset} tradicional do SemGrep).
-
-\section{Objetivo}
-\label{sec:objetivo}
-\par
-Os objetivos desta pesquisa estruturam-se em duas frentes: o objetivo geral, focado em solucionar o problema central do estudo, e os objetivos específicos, representam os subprodutos ou detalhamentos lógicos gerados para alcançar esse propósito maior.
-
-\subsection{Objetivo Geral}
-\label{sec:objgeral}
-\par
-O objetivo geral deste trabalho é demonstrar que um \textit{framework} de síntese automatizada de regras, baseando-se em Modelos de Linguagem de Larga Escala e integrado à ferramenta SemGrep, apresenta precisão e \textit{recall} estatisticamente superiores às abordagens estáticas tradicionais na detecção de vulnerabilidades críticas em linguagem C.
-Busca-se demonstrar que este modelo supera abordagens estáticas tradicionais na identificação precisa de, no mínimo, cinco categorias de vulnerabilidades de software, em inglês \textit{Common Weakness Enumeration} (CWE).
-
-\subsection{Objetivos específicos}
-\label{sec:objespecifico}
-\par
-Sobre os objetivos específicos, temos:
-
-\begin{enumerate}
-  \item Determinar os limites de detecção semântica (\textit{corner-cases}) que podem ser superados pela abordagem gerativa de LLMs em relação aos conjuntos de regras predefinidas (\textit{ruleset}) estáticos.
-  \item Estabelecer o ganho quantitativo de desempenho (\textit{Recall}, Precisão e F1-Score) de regras sintetizadas dinamicamente frente aos analisadores tradicionais do estado da arte.
-  \item Determinar a viabilidade técnica e a escalabilidade de inferência da arquitetura proposta utilizando modelos de linguagem de menor escala (com contagem reduzida de parâmetros), visando garantir a viabilidade técnica da execução do \textit{framework} em infraestruturas locais com restrições de custo e \textit{hardware}.
-\end{enumerate}
-
 % ===============================================================
-% CAPÍTULO 2 - REVISÃO BIBLIOGRÁFICA
+% CAPÍTULO 2 - REVISÃO BIBLIOGRÁFICA / TRABALHOS RELACIONADOS
 % ===============================================================
-\chapter{Revisão Bibliográfica}
+\chapter{Revisão Bibliográfica / Trabalhos Relacionados}
 \label{cap:revisao}
 \par
 Este capítulo tem como finalidade estabelecer o embasamento teórico e tecnológico que sustenta a pesquisa proposta.
@@ -368,8 +426,9 @@ Inicialmente, descreve-se a metodologia utilizada para a seleção dos trabalhos
 Os fundamentos técnicos são apresentados com ênfase em Modelos de Linguagem de Grande Escala (LLMs), Processamento de Linguagem Natural e os princípios de Análise Estática. 
 Por fim, conduz-se uma revisão dos trabalhos correlatos, identificando as lacunas que esta pesquisa busca preencher.
 
+% ---------------------------------------------------------------
 \section{Metodologia da pesquisa bibliográfica}
-\label{sec:metodologia_pesquisa}
+\label{sec:metodologia_pesquisa_bib}
 \par
 A pesquisa bibliográfica foi conduzida de forma sistemática para identificar trabalhos científicos relevantes sobre a utilização de LLMs no suporte à análise estática. 
 As buscas foram centralizadas no motor Google Acadêmico (\textit{Google Scholar}), devido à sua ampla indexação, com foco principal em bases de dados consolidadas na área da Computação, como arXiv, IEEE Xplore e ACM Digital Library.
@@ -382,8 +441,7 @@ Estes termos foram combinados por meio de operadores booleanos (\textit{AND}, \t
     \centering
     \caption{\textit{Query} utilizada durante a pesquisa de materiais.}
     \includegraphics[width=0.98\textwidth]{Images/Query.png}
-    \\
-    {\small Fonte: Elaborado pelo autor (2026)}
+    \legend{Fonte: Elaborado pelo autor (2026)}
     \label{fig:query}
 \end{figure}
 
@@ -400,8 +458,7 @@ Na segunda fase (afunilamento), os trabalhos restantes passaram por uma leitura 
     \centering
     \caption{Funil de pesquisa.}
     \includegraphics[width=0.75\textwidth]{Images/Funil.png}
-    \\
-    {\small Fonte: Elaborado pelo autor (2026)}
+    \legend{Fonte: Elaborado pelo autor (2026)}
     \label{fig:funil}
 \end{figure}
 
@@ -411,7 +468,8 @@ Esse processo de filtragem resultou em 6 artigos classificados com notas entre 9
 Adicionalmente, foram incorporados 5 trabalhos seminais anteriores a 2021, essenciais para a consolidação dos conceitos clássicos abordados neste estudo.
 
 % ---------------------------------------------------------------
-\section{Referencial teórico}
+% ---------------------------------------------------------------
+\section{Fundamentos teóricos}
 \label{cap:referencial}
 \par
 O referencial teórico apresenta os conceitos fundamentais que sustentam o desenvolvimento deste projeto. 
@@ -446,8 +504,7 @@ Nós auxiliares exigidos pela gramática para contornar ambiguidades ou definir 
     \centering
     \caption{Árvore Sintática Abstrata para a expressão 9-5+2}
     \includegraphics[width=0.45\textwidth]{Images/AST.png}
-    \\
-    {\small Fonte: \cite{aho2007compilers}}
+    \legend{Fonte: \cite{aho2007compilers}}
     \label{fig:ast}
 \end{figure}
 
@@ -552,8 +609,7 @@ Com sua ativa continuidade e plataforma capaz de compartilhar regras existentes 
     \centering
     \caption{Exemplo de regra simplificada para detecção de falhas OSCI em Java.}
     \includegraphics[width=0.95\textwidth]{Images/Semgrep-java.png}
-    \\
-    {\small Fonte: Adaptado de \cite{jiang2025factaligned}.}
+    \legend{Fonte: Adaptado de \cite{jiang2025factaligned}.}
     \label{fig:semgrepjava}
 \end{figure}
 
@@ -959,7 +1015,8 @@ Para analisar de forma adequada o custo gerado pela geração e análise, este t
 Será analisado o número de consumo de \textit{tokens} processados nas entradas e saídas para cada projeto, bem como a medição do tempo exato de execução que a ferramenta levou para analisar o repositório.
 
 % ---------------------------------------------------------------
-\section{Trabalhos relacionados}
+% ---------------------------------------------------------------
+\section{Trabalhos correlatos}
 \label{sec:trabalhosrelacionados}
 
 Os três trabalhos apresentados a seguir foram selecionados por enfrentarem diretamente o mesmo problema central: a análise estática tradicional, buscando melhorias através de LLMs e geração de regras utilizando a mesma ferramenta SemGrep.
@@ -984,8 +1041,7 @@ Com um \textit{commit} como entrada, KNighter retorna como saída um analisador 
     \centering
     \caption{\textit{Overview} do KNighter}
     \includegraphics[width=1\textwidth]{Images/Overview-KNighter.png}
-    \\
-    {\small Fonte: Adaptado para o português para melhor compreensão \cite{yang2025knighter}.}
+    \legend{Fonte: Adaptado para o português para melhor compreensão \cite{yang2025knighter}.}
     \label{fig:overviewknighter}
 \end{figure}
 
@@ -1132,8 +1188,7 @@ A partir desses títulos, foi estimaa a taxa de detecção de falsos positivos e
     \centering
     \caption{Análise de CWEs (\textit{Memory Leak}, \textit{Use After Free}, \textit{Null Pointer Dereference})}
     \includegraphics[width=0.65\textwidth]{Images/LLM-Based-Analise.png}
-    \\
-    {\small Fonte: Adaptado para o português para melhor compreensão \cite{li2026llmbased}.}
+    \legend{Fonte: Adaptado para o português para melhor compreensão \cite{li2026llmbased}.}
     \label{fig:cwescomparation}
 \end{figure}
 
@@ -1194,7 +1249,7 @@ Para facilitar essa análise, a Tabela \ref{tab:trabalhosrelacionados} sintetiza
 % ===============================================================
 % CAPÍTULO 3 - DESENVOLVIMENTO
 % ===============================================================
-\chapter{Desenvolvimento}
+\chapter{Desenvolvimento / Implementação / Experimentos}
 \label{cap:desenvolvimento}
 \par
 Este capítulo apresenta a proposta de desenvolvimento deste trabalho, detalhando a arquitetura do sistema, as decisões metodológicas, o planejamento experimental e o cronograma de execução previstos para TCC2. 
@@ -1202,7 +1257,23 @@ Expandindo como será realizada cada etapa da solução, bem como serão apresen
 Em sincronia com a proposta de pesquisa, conforme orientado por \citeonline{Wazlawick2020}, com o foco está na especificação precisa do que será implementado e avaliado.
 
 % ---------------------------------------------------------------
-\section{Visão geral da solução proposta}
+\section{Metodologia da pesquisa}
+\label{sec:metodologia_pesquisa}
+\par
+Este trabalho utiliza o método \textit{Design Science Research} (DSR), conforme definido \citeonline{hevner2004design}, como método científico orientador.
+O DSR é um paradigma de pesquisa fundamentalmente focado na resolução de problemas, responsável por produzir quatro tipos de artefatos: constructos, modelos, métodos, instanciações \cite{hevner2004design}.
+\par
+O ciclo deste trabalho está estruturado em quatro fases:
+(1) \textbf{construção de \textit{dataset}}, organização e identificação de \textit{datasets} públicos e banco de \textit{commits} de bases de código de projetos \textit{open-source};
+(2) \textbf{\textit{pipeline} de geração de regras}, aplicação de LLMs em um \textit{pipeline} para gerar regras satisfatórias para a ferramenta SemGrep;
+(3) \textbf{avaliação de resultados}, analisar cada relatório para obter taxa de falsos positivos no \textit{dataset} de aprendizado;
+(4) \textbf{aplicação no mundo real}, com o conjunto de regras, será analisado os resultados em projetos \textit{open-source} como Linux Kernel.
+
+% ---------------------------------------------------------------
+\section{Detalhes da implementação}
+\label{sec:implementacao}
+
+\subsection{Visão geral da solução proposta}
 \label{sec:solucao}
 \par
 A solução proposta consiste em uma Extensão Geradora de Regras baseado em LLMs direcionada a Projetos de Larga Escala para a ferramenta de análise estática, SemGrep.
@@ -1225,21 +1296,8 @@ O \textit{pipeline} recebe o código-fonte como entrada e utiliza uma LLM para a
         \bottomrule
     \end{tabular}%
     }
-    \vspace{0.5em}
-    \footnotesize Fonte: Elaborado pelo autor (2026).
+    \legend{Fonte: Elaborado pelo autor (2026)}
 \end{figure}
-
-\par
-Este trabalho utiliza o método \textit{Design Science Research} (DSR), conforme definido \citeonline{hevner2004design}, como método científico orientador.
-O DSR é um paradigma de pesquisa fundamentalmente focado na resolução de problemas, responsável por produzir quatro tipos de artefatos: constructos, modelos, métodos, instanciações \cite{hevner2004design}.
-\par
-O ciclo deste trabalho está estruturado em quatro fases:
-(1) \textbf{construção de \textit{dataset}}, organização e identificação de \textit{datasets} públicos e banco de \textit{commits} de bases de código de projetos \textit{open-source};
-(2) \textbf{\textit{pipeline} de geração de regras}, aplicação de LLMs em um \textit{pipeline} para gerar regras satisfatórias para a ferramenta SemGrep;
-(3) \textbf{avaliação de resultados}, analisar cada relatório para obter taxa de falsos positivos no \textit{dataset} de aprendizado;
-(4) \textbf{aplicação no mundo real}, com o conjunto de regras, será analisado os resultados em projetos \textit{open-source} como Linux Kernel.
-
-
 
 \subsection{Arquitetura do trabalho}
 \label{sec:arquitetura}
@@ -1279,8 +1337,7 @@ Essa decisão visa viabilizar a execução do \textit{framework} em infraestrutu
     \centering
     \caption{\textit{Pipeline} para gerador de regras.}
     \includegraphics[width=1\textwidth]{Images/Pipeline.png}
-    \\
-    {\small Fonte: Elaborado pelo autor (2026)}
+    \legend{Fonte: Elaborado pelo autor (2026)}
     \label{fig:pipeline}
 \end{figure}
 
@@ -1288,10 +1345,17 @@ Essa decisão visa viabilizar a execução do \textit{framework} em infraestrutu
     \centering
     \caption{Pós-processamento para otimizar regras e abranger \textit{corner-cases}}
     \includegraphics[width=1\textwidth]{Images/QuartoAgente.png}
-    \\
-    {\small Fonte: Elaborado pelo autor (2026)}
+    \legend{Fonte: Elaborado pelo autor (2026)}
     \label{fig:quartoagente}
 \end{figure}
+
+% ---------------------------------------------------------------
+\section{Experimentos e cenário de testes}
+\label{sec:experimentos}
+
+% ---------------------------------------------------------------
+\section{Resultados e análises}
+\label{sec:resultados}
 
 % ---------------------------------------------------------------
 \section{Cronograma de trabalho}
@@ -1357,13 +1421,25 @@ O cronograma a seguir está organizado as atividades do TCC2 em 16 semanas, conf
 \end{figure}
 
 
+% ===============================================================
+% CAPÍTULO 4 - CONCLUSÃO
+% ===============================================================
+\chapter{Conclusão}
+\label{cap:conclusao}
+
+\section{Retomada do problema e dos objetivos}
+
+\section{Contribuições para a Computação}
+
+\section{Limitações e trabalhos futuros}
+
 % ---------------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
 % ---------------------------------------------------------------
 \postextual
 
 % ===============================================================
-% CAPÍTULO 4 - REFERÊNCIAS BIBLIOGRÁFICAS
+% REFERÊNCIAS BIBLIOGRÁFICAS
 % ===============================================================
 % As referências bibliográficas são geradas automaticamente a partir
 % do arquivo bibliografia.bib, seguindo o padrão ABNT (NBR 6023).
