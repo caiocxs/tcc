@@ -271,36 +271,31 @@ TP   & \textit{True Positive} (Verdadeiros Positivos) \\
 \chapter{Introdução}
 \label{cap:introducao}
 \par
-\novo{Para dimensionar o problema tratado neste trabalho, basta observar o que acontece quando uma falha de \textit{software} passa despercebida.
-Em 2014, a ausência de uma única verificação de tamanho em uma rotina de manipulação de memória da biblioteca OpenSSL, escrita em C e utilizada para proteger a comunicação de grande parte dos \textit{sites} da internet, deu origem à vulnerabilidade conhecida como \textit{Heartbleed} (CVE-2014-0160).
-A falha permitia que qualquer pessoa lesse trechos da memória dos servidores afetados, expondo senhas, dados pessoais e chaves criptográficas.
-Estima-se que, no momento da divulgação, entre 24\% e 55\% dos servidores HTTPS do milhão de \textit{sites} mais acessados do mundo estavam vulneráveis \cite{durumeric2014heartbleed}.}
+Para dimensionar o problema tratado neste trabalho, basta observar o que acontece quando uma falha de \textit{software} passa despercebida.
+Em 2014, a ausência de uma única verificação de tamanho em uma rotina de manipulação de memória da biblioteca OpenSSL, escrita em C e utilizada para proteger a comunicação de grande parte dos \textit{sites} da internet, deu origem à vulnerabilidade conhecida como \textit{Heartbleed} (CVE-2014-0160) \cite{durumeric2014heartbleed}.
 \par
-\novo{Esse caso não é isolado.
+A falha permitia que qualquer pessoa lesse trechos da memória dos servidores afetados, expondo senhas, dados pessoais e chaves criptográficas.
+Estima-se que, no momento da divulgação, entre 24\% e 55\% dos servidores HTTPS do milhão de \textit{sites} mais acessados do mundo estavam vulneráveis \cite{durumeric2014heartbleed}.
+O código CVE-2014-0160 que identifica a falha vem do catálogo CVE (\textit{Common Vulnerabilities and Exposures}), que atribui um identificador público e único a cada vulnerabilidade divulgada em uma versão específica de um \textit{software}, para que equipes e ferramentas de segurança saibam que estão se referindo ao mesmo problema \cite{cveabout}.
+O catálogo é apresentado na Seção~\ref{sec:cves}.
+\par
+Esse caso não é isolado.
 A Microsoft relata que cerca de 70\% das vulnerabilidades de seus produtos às quais atribui um CVE a cada ano são problemas de segurança de memória \cite{msrc2019proactive}.
 A equipe do navegador Chromium, do Google, chegou a uma proporção semelhante ao analisar 912 falhas de severidade alta ou crítica registradas desde 2015: cerca de 70\% eram problemas de segurança de memória, e metade destas, do tipo uso de memória após a sua liberação \cite{chromium2020memorysafety}.
+\par
 Em linguagens como C, o programador é responsável por reservar e devolver manualmente a memória utilizada.
 Esquecer de liberá-la (vazamento de memória), liberá-la duas vezes ou continuar usando um endereço já liberado são erros simples de cometer e difíceis de perceber, mas que podem travar sistemas inteiros ou permitir que um invasor execute código malicioso.
-Essas falhas, catalogadas e detalhadas na Seção \ref{sec:cwes}, constituem o foco deste trabalho.}
+\par
+Esses tipos de erro são catalogados pela CWE (\textit{Common Weakness Enumeration}), uma lista mantida pela comunidade que descreve fraquezas comuns de \textit{software}, isto é, condições no código que, sob determinadas circunstâncias, podem dar origem a vulnerabilidades \cite{mitrecwe}.
+Enquanto um CVE identifica uma vulnerabilidade concreta em um produto, uma CWE descreve o tipo de erro que a causou: o uso de memória já liberada, por exemplo, corresponde à CWE-416.
+Este trabalho se concentra em cinco dessas categorias, todas relacionadas a erros de memória em C, apresentadas na Seção~\ref{sec:cwes}.
 \par
 Ferramentas de análise estática são amplamente empregadas no desenvolvimento de \textit{software} e garantia de código \cite{hou2025generation}.
 Por essa abordagem não necessitar de compilação e execução prévia do sistema, ela é considerada um método rápido e econômico para a identificação de problemas em seus estágios iniciais.
 Segundo \citeonline{jiang2025factaligned}, as ferramentas de análise estática emergiram como componentes indispensáveis nos fluxos de trabalhos, fornecendo mecanismos automatizados para detecção de defeitos, vulnerabilidades de segurança e violações de padrões de codificação.
 \par
-\antigo{A análise estática possui diversas vertentes.}
-\antigo{Uma estrutura fundamental conhecida é a Árvore de Sintaxe Abstrata, em inglês \itshape Abstract Syntax Tree\upshape{} (AST), uma representação intermediária que modela a estrutura hierárquica do código-fonte.}
-\antigo{ASTs fornecem uma representação de programa geralmente utilizada para análises insensíveis ao fluxo (\itshape flow-insensitive\upshape{}), onde a ordem sequencial das instruções não é estritamente necessária {\cite{moller2024spa}}.}
-\par
-\antigo{Complementar a isso, utilizam-se os grafos de fluxo de controle, em inglês \itshape Control Flow Graphs\upshape{} (CFG).}
-\antigo{Enquanto a AST foca na sintaxe, o CFG é construído para modelar os possíveis caminhos de execução do programa, sendo essencial para análises sensíveis ao fluxo (\itshape flow-sensitive\upshape{}).}
-\par
-\antigo{CFGs são frequentemente utilizados para a análise clássica de fluxo de dados.}
-\antigo{Nesse processo, atribui-se a cada nó do grafo uma variável cujas restrições de fluxo (equações ou inequações) relacionam o valor do nó com o de seus vizinhos (predecessores ou sucessores) através de funções monótonas.}
-\antigo{A propagação das informações ao longo dos nós ocorre até que o algoritmo atinja o menor ponto fixo (\itshape least fixed point\upshape{}, denotado como $lfp(f)$) dentro de um reticulado completo (\itshape complete lattice\upshape{}).}
-\antigo{Essa solução matemática é a mais precisa possível para o sistema de restrições gerado e atua como uma aproximação conservadora de todas as execuções do programa, permitindo inferir propriedades seguras sobre o código analisado {\cite{moller2024spa}}.}
-\par
-\novo{Em termos simples, essas ferramentas funcionam como um revisor automático que lê o código em busca de padrões perigosos, sem precisar executá-lo.
-Os detalhes de como essa leitura é feita, por meio de estruturas como árvores de sintaxe e grafos de fluxo, são apresentados na Seção \ref{sec:analisetradicional}.}
+Em termos simples, essas ferramentas funcionam como um revisor automático que lê o código em busca de padrões perigosos, sem precisar executá-lo.
+Os detalhes de como essa leitura é feita, por meio de estruturas como árvores de sintaxe e grafos de fluxo, são apresentados na Seção \ref{sec:analisetradicional}.
 
 \begin{table}[htb]
     \centering
@@ -332,7 +327,7 @@ Os detalhes de como essa leitura é feita, por meio de estruturas como árvores 
 \end{table}
 
 \par
-\antigo{Apesar da eficácia das análises baseadas em AST e CFG,} \novo{Apesar de sua eficácia,} a implementação tradicionaldessas ferramentas frequentemente depende de heurísticas pré-definidas, modelagens formais ou conjuntos de regras criadas manualmente para identificar padrões de falhas.
+Apesar de sua eficácia, a implementação tradicional dessas ferramentas frequentemente depende de heurísticas pré-definidas, modelagens formais ou conjuntos de regras criadas manualmente para identificar padrões de falhas.
 Uma vez que as vulnerabilidades são detectadas, o próximo desafio no ciclo de desenvolvimento é a sua correção.
 \par
 Em resposta às limitações da detecção de falhas, o campo de Reparo de Programa Automatizado, em inglês \textit{Automated Program Repair} (APR), consolidou-se como uma área de pesquisa na engenharia de \textit{software}.
@@ -348,55 +343,103 @@ A Tabela \ref{tab:limitacoes_analise_trad} sintetiza as principais limitações 
 
 \begin{figure}[h]
     \centering
-    \caption{Motivação para \textit{checkers} feitos por llms.}
+    \caption{Motivação para \textit{checkers} feitos por LLMs.}
     \includegraphics[width=0.55\textwidth]{Images/problemas em larga escala.png}
     \legend{Fonte: Adaptado pelo autor para melhor compreensão \cite{yang2025knighter}}
     \label{fig:motivacaocheckers}
 \end{figure}
 
 \par
-\novo{Um alarme falso, ou falso positivo, ocorre quando a ferramenta aponta como defeituoso um trecho de código que está correto; já um falso negativo é uma falha real que a ferramenta não consegue detectar.
-Ambos são prejudiciais: se a maior parte dos avisos for falsa, os desenvolvedores deixam de confiar na ferramenta e passam a ignorá-la \cite{aho2007compilers}, enquanto os falsos negativos permitem que vulnerabilidades cheguem ao usuário final.}
+Um alarme falso, ou falso positivo, ocorre quando a ferramenta aponta como defeituoso um trecho de código que está correto; já um falso negativo é uma falha real que a ferramenta não consegue detectar.
+Ambos são prejudiciais: se a maior parte dos avisos for falsa, os desenvolvedores deixam de confiar na ferramenta e passam a ignorá-la \cite{aho2007compilers}, enquanto os falsos negativos permitem que vulnerabilidades cheguem ao usuário final.
 \par
 Nos últimos anos, muitas técnicas foram desenvolvidas para minimizar alarmes falsos em analisadores estáticos \cite{jiang2025factaligned}.
-Recentemente, Modelos de Linguagem de Grande Porte (LLMs) e sua ampla aplicação mudaram profundamente o domínio de análise estática, a maioria dessas técnicas empregando LLMs para compreender o código-fonte diretamente ou os dados das próprias ferramentas de análise estática, para determinar a presença de \textit{bugs}, como sua localização e tipo \cite{hou2025generation}.
+Recentemente, Modelos de Linguagem de Grande Porte (LLMs) passaram a ser incorporados ao domínio da análise estática.
+Eles não substituem as ferramentas tradicionais, que continuam em uso por serem determinísticas e capazes de percorrer bases de código com milhões de linhas \cite{yang2025knighter}; em vez disso, atuam em conjunto com elas, de duas formas.
+\par
+Na primeira, o LLM examina diretamente o código-fonte ou os dados produzidos pelas próprias ferramentas de análise estática para determinar a presença, a localização e o tipo de \textit{bugs} \cite{hou2025generation}.
+Na segunda, o LLM gera as regras ou os verificadores que a ferramenta tradicional executa, unindo a capacidade de generalização do modelo à escalabilidade da análise estática \cite{hou2025generation, yang2025knighter}.
+É nesta segunda forma que se insere este trabalho.
 \par
 Modelos de Linguagem de Larga Escala possuem o conhecimento prévio adquirido durante seu pré-treinamento em vastos repositórios de código aberto. 
 Durante a inferência, essas capacidades podem ser direcionadas via engenharia de \textit{prompt} (como o fornecimento de históricos de \textit{commits} de correção no contexto) para extrair padrões sintáticos e semânticos de \textit{bugs} específicos do sistema \cite{tang2021grammar}. 
 A capacidade de analisar vários conteúdos sugere que LLMs são capazes de se adaptar a novos tipos de falhas sem a necessidade de criação explícita de verificações específicas \cite{yang2025knighter}.
 \par
+Um LLM não lê o texto caractere a caractere: a entrada é dividida em \textit{tokens}, unidades que podem corresponder a palavras inteiras, partes de palavras ou símbolos, como os operadores de uma linguagem de programação.
+A quantidade máxima de \textit{tokens} que o modelo consegue processar de uma só vez é chamada de janela de contexto; ao gerar cada \textit{token}, o modelo tem acesso a todos os \textit{tokens} anteriores dentro dessa janela, mas a nenhum que esteja fora dela \cite{jurafsky2026speech}.
+Na prática, a janela determina quanto código e quanta instrução cabem em uma única consulta ao modelo.
+\par
 Embora os modelos de linguagem desenvolvidos até o ano de 2026 possuam janelas de contexto na ordem de milhões de \textit{tokens}, a inspeção direta e contínua do código-fonte esbarra em severas restrições práticas e custos proibitivos.
-A raiz dessa limitação reside na arquitetura Transformer, cujo mecanismo de autoatenção (\textit{self-attention}) possui uma complexidade computacional e de memória quadrática ($O(n^2)$) em relação ao tamanho da sequência de entrada \cite{vaswani2017attention}.
+A raiz dessa limitação está na arquitetura \textit{Transformer} \cite{vaswani2017attention}, sobre a qual os LLMs atuais são construídos.
+Trata-se de uma rede neural formada por uma pilha de camadas que, em vez de ler o texto palavra a palavra, como as redes recorrentes, processa todos os \textit{tokens} da entrada de uma só vez.
+\par 
+O componente central de cada camada é o mecanismo de autoatenção (\textit{self-attention}): para cada \textit{token}, o modelo calcula um peso de relevância em relação a cada um dos demais \textit{tokens} da sequência e combina as representações destes de acordo com esses pesos.
+É isso que permite relacionar, por exemplo, o uso de uma variável à sua declaração feita muitas linhas antes.
+A Figura \ref{fig:selfattention} ilustra essa ideia: cada círculo corresponde a um \textit{token}, e as linhas entre duas colunas indicam que cada \textit{token} de uma camada é calculado a partir de todos os \textit{tokens} da camada anterior, ponderados pelos pesos de atenção.
+A arquitetura e o cálculo da atenção são detalhados na Seção \ref{sec:modelostransformers}.
+
+\begin{figure}[h]
+    \centering
+    \caption{\textit{Self-Attention} de LLMs. (TEMPORARIO)}
+    \includegraphics[width=0.55\textwidth]{Images/temp_self_attention.png}
+    \legend{Fonte: Elaborado pelo autor(2026)}
+    \label{fig:selfattention}
+\end{figure}
+
+\par
+Essa comparação de todos os \textit{tokens} com todos os outros é justamente o que limita o tamanho da entrada.
+Para uma sequência de $n$ \textit{tokens}, a autoatenção calcula $n \times n$ pesos, e \citeonline{vaswani2017attention} indicam para ela um custo por camada de $O(n^2 \cdot d)$, em que $d$ é a dimensão das representações.
+Como essa matriz de pesos também precisa ser mantida em memória, o consumo de memória da atenção cresce igualmente de forma quadrática com o tamanho da sequência \cite{dao2022flashattention}: dobrar o tamanho da entrada quadruplica esse custo.
 Como consequência, a submissão integral de bases de código de projetos em larga escala, como o \textit{kernel} do Linux, provoca uma explosão nos requisitos de processamento \cite{tunstall2022natural}.
 \par 
 Estudos empíricos confirmam que essa abordagem pode consumir dezenas de milhões de \textit{tokens} e exigir dias de processamento contínuo, criando uma limitação crítica para a escalabilidade das ferramentas \cite{hou2025generation}.
 Essa sobrecarga de contexto exacerba o risco de alucinações da inteligência artificial, induzindo o modelo a gerar inferências estruturalmente plausíveis, porém tecnicamente incorretas.
 \par
-Para contornar as limitações de memória e o alto custo da inferência direta por um único modelo, a engenharia de \textit{software} tem explorado a aplicação de Sistemas Multi-Agentes.
+Para contornar as limitações da janela de contexto e o alto custo da inferência direta por um único modelo, ferramentas recentes de detecção de vulnerabilidades baseadas em LLMs têm adotado fluxos de trabalho com agentes e sistemas multi-agentes, nos quais uma tarefa complexa é decomposta entre agentes coordenados, cada um responsável por uma subtarefa localizada \cite{li2026llmbased}.
 Um agente inteligente é fundamentalmente uma entidade computacional que percebe o seu ambiente e age sobre ele de alguma forma \cite{russell2020artificial}.
 Em vez de submeter bases de código gigantescas a uma única instância de inteligência artificial, o processamento é descentralizado e distribuído entre múltiplos agentes.
+\par
+O RepoAudit, um agente baseado em LLM para auditoria de repositórios de código, por exemplo, parte justamente da constatação de que a janela de contexto limitada e o custo em tempo e em \textit{tokens} impedem que um LLM audite um repositório inteiro de uma só vez; em vez disso, seu agente explora a base de código sob demanda, função por função, e submete os resultados a um módulo validador para reduzir alucinações \cite{guo2025repoaudit}.
 \par
 Em um ambiente cooperativo, a comunicação e a divisão de tarefas entre os agentes emergem como comportamentos racionais essenciais para a resolução de problemas complexos \cite{russell2020artificial}.
 Dessa forma, cada agente LLM assume um papel restrito e especializado, como abstração, síntese de sintaxe ou validação, colaborando de forma iterativa para reduzir a sobrecarga de \textit{tokens} e aumentar a precisão na geração do artefato final.
 \par
 A figura \ref{fig:motivacaocheckers} introduz motivações para a necessidade de métodos mais eficientes e, principalmente, especializados, tal que em projetos grandes, a análise estática possui dois desafios: criar regras para diversos padrões de bugs e gerenciamento de bases de códigos imensas \cite{yang2025knighter}.
-\par
-Considerando esses dados, o analisador estático ideal deveria: detectar uma diversidade de falhas, incluindo \textit{corner-cases} e semânticas específicas de sistemas, e eficientemente processar milhões de linhas de código \cite{yang2025knighter}.
+Considerando esses dados, o analisador estático ideal deveria: detectar uma diversidade de falhas, incluindo \textit{corner-cases} e semânticas específicas de sistemas, e eficientemente processar milhões de linhas de código.
 Porém, dos métodos existentes, geralmente sacrificam um desses objetivos \cite{yang2025knighter}.
 \par
-O método apresentado por \citeonline{yang2025knighter}, KNighter, é um analisador estático sintetizado utilizando LLMs, que ao invés de métodos diretos de utilização de LLMs, é realizado um treinamento de padrões de \textit{bugs} a partir de histórico de \textit{patches} que a partir disso é dedicado para um \textit{checker} especializado.
-A partir desse paradigma, \citeonline{yang2025knighter} sobrepassa os problemas de limites de contextos e custos absurdos de analisar bases de códigos de milhões de linhas com diversos bugs.
+Uma proposta nessa direção é o KNighter \cite{yang2025knighter}, um sistema que usa LLMs para gerar automaticamente verificadores (\textit{checkers}) para o \textit{Clang Static Analyzer} (CSA), analisador estático de código C.
+Em vez de pedir ao LLM que leia o código inteiro em busca de falhas, o KNighter fornece a ele um \textit{commit} que corrigiu um \textit{bug} real.
+A partir dessa correção, o LLM descreve o padrão do \textit{bug} e escreve um verificador especializado nesse padrão, que só é aceito se apontar o código anterior à correção como defeituoso e o código corrigido como correto.
+A varredura da base de código é então feita pelo próprio CSA, e não pelo LLM, o que contorna os limites da janela de contexto e o custo de analisar projetos com milhões de linhas, como o \textit{kernel} do Linux \cite{yang2025knighter}.
+Assim como o RepoAudit, o KNighter também recorre a agentes auxiliares: um deles corrige erros de sintaxe nos verificadores gerados, e outro faz a triagem dos alarmes que esses verificadores produzem, descartando os falsos \cite{yang2025knighter}.
+O funcionamento do KNighter é detalhado na Seção~\ref{sec:knighter}.
 \par
-\novo{Uma alternativa ao uso de analisadores construídos do zero são as ferramentas de análise estática baseadas em regras, como o SemGrep.
+Uma alternativa ao uso de analisadores construídos do zero são as ferramentas de análise estática baseadas em regras, como o SemGrep.
 O SemGrep é uma ferramenta de código aberto na qual o usuário descreve, em arquivos no formato YAML, regras cujos padrões imitam a própria sintaxe da linguagem analisada, como ilustra a Figura \ref{fig:semgrep} \cite{hou2025generation}.
-Por dispensar a construção de um analisador específico para cada tipo de falha, \citeonline{hou2025generation} utilizam o SemGrep como base para o conjunto de regras (\textit{ruleset}) que geram por meio de LLMs, abordagem também adotada neste trabalho.
-Seu funcionamento é detalhado na Seção \ref{sec:analiseestaticaregras}.}
+\par
+Ferramentas de análise estática costumam varrer o código com uma série de regras, chamada de conjunto de regras (\textit{ruleset}); uma ferramenta para C++, por exemplo, pode ter um \textit{ruleset} com verificações de vazamento de memória, de acesso fora dos limites de um vetor e de arquivos abertos e não fechados \cite{hou2025generation}.
+\par
+O SemGrep disponibiliza um \textit{ruleset} oficial, que \citeonline{hou2025generation} usam como referência para avaliar as regras geradas por LLMs; neste trabalho, é a esse conjunto que se refere a expressão \textit{ruleset} tradicional.
+Por dispensar a construção de um analisador específico para cada tipo de falha, \citeonline{hou2025generation} utilizam o SemGrep como base para as regras que geram por meio de LLMs, abordagem também adotada neste trabalho.
+Seu funcionamento é detalhado na Seção \ref{sec:analiseestaticaregras}.
 
-% ---------------------------------------------------------------
 \section{Formulação do problema}
 \label{sec:problema}
+\par
+Como discutido na Seção \ref{sec:contexto}, a análise estática em projetos de larga escala precisa conciliar dois objetivos: detectar uma diversidade de falhas, incluindo \textit{corner-cases}, e processar bases de código com milhões de linhas.
+Submeter o código diretamente a um LLM poderia ampliar a abrangência da detecção, mas esbarra nos limites da janela de contexto e no custo de inferência.
+Diante disso, este trabalho formula a seguinte pergunta de pesquisa:
 
-% ---------------------------------------------------------------
+\begin{quote}
+\textit{Um \textit{framework} multi-agente baseado em LLMs é capaz de sintetizar regras para o SemGrep que detectem vulnerabilidades em código C com \textit{recall} e precisão estatisticamente superiores aos do \textit{ruleset} tradicional da ferramenta?}
+\end{quote}
+
+\par
+O escopo restringe-se à linguagem C, a cinco categorias de CWE (Seção \ref{sec:cwes}) e ao SemGrep como motor de execução das regras.
+Não fazem parte do escopo a comparação com ferramentas de análise estática proprietárias nem a aplicação a outras linguagens de programação.
+A pergunta é desdobrada nos objetivos específicos (Seção \ref{sec:objespecifico}) e na hipótese (Seção \ref{sec:hipotese}), e os resultados obtidos são discutidos no Capítulo \ref{cap:desenvolvimento}.
+
 \section{Objetivos e hipótese}
 \label{sec:objetivos}
 \par
@@ -407,6 +450,11 @@ Os objetivos desta pesquisa estruturam-se em duas frentes: o objetivo geral, foc
 \par
 O objetivo geral deste trabalho é demonstrar que um \textit{framework} de síntese automatizada de regras, baseando-se em Modelos de Linguagem de Larga Escala e integrado à ferramenta SemGrep, apresenta precisão e \textit{recall} estatisticamente superiores às abordagens estáticas tradicionais na detecção de vulnerabilidades críticas em linguagem C.
 Busca-se demonstrar que este modelo supera abordagens estáticas tradicionais na identificação precisa de, no mínimo, cinco categorias de vulnerabilidades de software, em inglês \textit{Common Weakness Enumeration} (CWE).
+\par
+Ao final da execução experimental (Capítulo \ref{cap:desenvolvimento}), este objetivo foi apenas parcialmente alcançado.
+Conforme detalhado nas Seções \ref{sec:resultadoscwe416} e \ref{sec:tentativassemsucesso}, apenas uma das cinco categorias de CWE originalmente previstas (CWE-416) obteve alguma regra efetivamente aprovada pelo critério de validação definido, e de forma instável entre as sementes de particionamento avaliadas; nas demais quatro categorias (CWE-401, CWE-415, CWE-457 e CWE-476), nenhuma configuração testada atingiu os critérios mínimos de aprovação.
+\par
+Como os critérios de sucesso de um objetivo de pesquisa devem ser definidos antes da execução, e não ajustados depois para se adequar ao resultado obtido \cite{Wazlawick2020}, o objetivo geral foi mantido em sua forma original, e a divergência entre o planejado e o alcançado é retomada no Capítulo \ref{cap:conclusao}.
 
 \subsection{Objetivos específicos}
 \label{sec:objespecifico}
@@ -415,14 +463,31 @@ Sobre os objetivos específicos, temos:
 
 \begin{enumerate}
   \item Determinar os limites de detecção semântica (\textit{corner-cases}) que podem ser superados pela abordagem gerativa de LLMs em relação aos conjuntos de regras predefinidas (\textit{ruleset}) estáticos.
-  \item \antigo{Estabelecer} \novo{Avaliar} o ganho quantitativode desempenho (\textit{Recall}, Precisão e F1-Score) de regras sintetizadas dinamicamente frente aos analisadores tradicionais do estado da arte.
+  \item Avaliar o ganho quantitativo de desempenho (\textit{Recall}, Precisão e F1-Score) de regras sintetizadas dinamicamente frente aos analisadores tradicionais do estado da arte.
   \item Determinar a viabilidade técnica e a escalabilidade de inferência da arquitetura proposta utilizando modelos de linguagem de menor escala (com contagem reduzida de parâmetros), visando garantir a viabilidade técnica da execução do \textit{framework} em infraestruturas locais com restrições de custo e \textit{hardware}.
 \end{enumerate}
+
+\par
+\novo{Avaliando-se retrospectivamente cada objetivo específico à luz dos resultados do Capítulo \ref{cap:desenvolvimento}: o primeiro objetivo foi efetivamente alcançado, uma vez que o próprio processo experimental revelou um limite de detecção semântica claro e documentado para o CWE-457 (Seção \ref{sec:resultadoscwe457}), no qual a limitação não está no modelo gerador, mas no próprio motor de análise de fluxo de contaminação do SemGrep \textit{Open Source}.
+\par
+O segundo objetivo foi \textbf{parcialmente alcançado}: identificou-se, no registro público e gratuito do SemGrep, regras diretamente aplicáveis a duas das cinco categorias avaliadas -- \texttt{c.lang.security.function-use-after-free}, para o CWE-416, e \texttt{c.lang.security.double-free}, para o CWE-415 --, que foram executadas sobre o mesmo subconjunto rotulado do Juliet Test Suite e comparadas, em \textit{Recall}, precisão e F1-Score, com a melhor configuração sintetizada para cada CWE (Seção \ref{sec:comparacaotradicional}).
+A regra tradicional obteve \textit{recall} de 17,4\% (F1 de 0,276) para o CWE-416 e de 28,7\% (F1 de 0,364) para o CWE-415, contra \textit{recall} de 89,2\% a 100\% (F1 de 0,72 a 0,91) e de 43,3\% a 76,3\% (F1 de 0,50 a 0,63), respectivamente, obtidos pelas regras sintetizadas neste trabalho -- superioridade observada em todas as sementes avaliadas, sem exceção, para ambos os CWEs.
+Para as demais três categorias (CWE-401, CWE-457 e CWE-476), nenhuma regra do registro gratuito do SemGrep mostrou-se relevante ao padrão de vulnerabilidade avaliado, de modo que a comparação quantitativa permanece indisponível para esses casos dentro do escopo gratuito investigado, lacuna ainda reconhecida como limitação no Capítulo \ref{cap:conclusao}.
+\par
+O terceiro objetivo foi alcançado: a comparação entre as combinações de modelos (Seção \ref{sec:combosmodelos}) demonstrou empiricamente que modelos de menor escala (combinação C, 4 bilhões de parâmetros) são tecnicamente viáveis para a execução completa do \textit{framework} em infraestrutura local, ainda que com desempenho inferior ao de modelos maiores (combinação D) em mecanismos de correção mais refinados, como o \texttt{field\_correct} (Seção \ref{sec:resultadosfieldcorrect}).}
 
 \subsection{Hipótese ou critério de validação}
 \label{sec:hipotese}
 \par
 A hipótese desta pesquisa é a de que a geração automatizada de regras por meio de um \textit{framework} multi-agente baseado em LLMs, integrado ao motor do SemGrep, produzirá taxas de detecção (\textit{Recall} e \textit{F1-Score}) de vulnerabilidades (CWEs) em C estatisticamente superiores e com maior identificação de \textit{corner-cases} quando comparada aos conjuntos de regras predefinidas dos analisadores estáticos tradicionais (como por exemplo \textit{ruleset} tradicional do SemGrep).
+\begingroup\color{red}
+\par
+Considerando os critérios de avaliação de hipóteses em pesquisa de Ciência da Computação \cite{Wazlawick2020}, esta hipótese é considerada \textbf{parcialmente confirmada}, com evidência mais direta do que a disponível na primeira redação deste capítulo.
+A superioridade estatística generalizada para as cinco categorias de CWE originalmente previstas não se sustenta diante dos dados coletados (Capítulo \ref{cap:desenvolvimento}): apenas CWE-416 e CWE-415 permitiram uma comparação quantitativa direta contra um analisador tradicional, e as demais três categorias sequer foram aprovadas pelo critério de validação interno deste trabalho (Seção \ref{sec:tentativassemsucesso}); nesse sentido, a hipótese é \textbf{refutada} em sua formulação mais ampla.
+\par
+Por outro lado, para as duas categorias em que uma linha de base tradicional pôde ser estabelecida (Seção \ref{sec:comparacaotradicional}), a hipótese \textbf{não é refutada}: a melhor configuração sintetizada para o CWE-416 atingiu \textit{recall} de 89,2\% a 100\% e F1-Score de 0,72 a 0,91, contra 17,4\% e 0,276 da regra tradicional equivalente do registro público do SemGrep; para o CWE-415, a melhor configuração atingiu \textit{recall} de 43,3\% a 76,3\% e F1-Score de 0,50 a 0,63, contra 28,7\% e 0,364 da regra tradicional -- superando-a em \textit{recall} nas cinco sementes avaliadas, sem exceção, em ambos os CWEs.
+A hipótese é, portanto, refutada em sua formulação ampla (generalização irrestrita entre categorias de CWE) e sustentada por evidência quantitativa direta nos dois casos em que uma linha de base tradicional pôde ser estabelecida, conclusão discutida com maior profundidade na Seção \ref{sec:comparacaotradicional} e retomada no Capítulo \ref{cap:conclusao}.
+\endgroup
 
 % ---------------------------------------------------------------
 \section{Justificativa}
@@ -900,6 +965,12 @@ A Atenção de Produto Escalar Escalado (\textit{Scaled Dot-Product Attention}) 
 onde $d_{k}$ é a dimensão dos vetores Chave. Essa operação permite que cada \textit{token} ``preste atenção'' em todos os outros \textit{tokens} da sequência, ponderando sua importância relativa.
 O fator de escala $\sqrt{d_k}$ é utilizado para estabilizar os gradientes durante treinamento.
 \par
+\novo{Essa fórmula é a origem do custo quadrático mencionado na Introdução.
+Para uma sequência de $n$ \textit{tokens}, as matrizes $Q$ e $K$ têm dimensão $n \times d_k$, e o produto $QK^T$ resulta em uma matriz $n \times n$ com um peso para cada par de \textit{tokens}, sendo cada peso um produto escalar entre vetores de dimensão $d_k$.
+Por isso, \citeonline[Tabela 1]{vaswani2017attention} atribuem à camada de autoatenção uma complexidade de $O(n^2 \cdot d)$ por camada, contra $O(n \cdot d^2)$ de uma camada recorrente, em que $d$ é a dimensão das representações.
+Os próprios autores observam que a autoatenção é mais rápida que a recorrência apenas enquanto $n$ é menor que $d$, situação comum nas frases usadas em tradução automática, mas que deixa de valer para entradas longas, como arquivos de código-fonte extensos.
+Além do tempo, a matriz $n \times n$ precisa ser armazenada em cada cabeça de atenção, o que torna também o consumo de memória quadrático em relação ao tamanho da sequência \cite{dao2022flashattention}.}
+\par
 Esses modelos não aplicam a atenção apenas uma vez.
 Em vez de realizar uma única função de atenção com dimensões globais, a arquitetura projeta as Consultas, Chaves e Valores $h$ vezes de forma linear e independente.
 Eles realizam $h$ projeções lineares independentes de $Q, K$ e $V$.
@@ -959,10 +1030,16 @@ Nestes casos, adota-se a arquitetura de Sistemas Multi-Agentes \cite{russell2020
 Os desafios de \textit{design} em ambiente multi-agentes diferem significativamente dos ambientes isolados, uma vez que, em cenários cooperativos, a comunicação e a coordenação entre as entidades emergem como comportamentos racionais necessários para evitar redundâncias e atingir o objetivo de forma eficiente \cite{russell2020artificial}.
 \par
 Com a consolidação dos Modelos de Linguagem de Larga Escala (LLMs), o paradigma baseado em agentes ganhou nova capacidade operacional.
-As LLMs passaram a atuar como o núcleo de raciocínio dos agentes, permitindo que interajam com o mundo, gerem raciocínios complexos e invoquem ferramentas externas de forma autônoma.
+\antigo{As LLMs passaram a atuar como o núcleo de raciocínio dos agentes, permitindo que interajam com o mundo, gerem raciocínios complexos e invoquem ferramentas externas de forma autônoma.}
+\novo{Os LLMs passaram a atuar como o núcleo de decisão dos agentes: em ferramentas como o RepoAudit, um agente baseado em LLM explora de forma autônoma um repositório de código, decidindo quais funções analisar a seguir e registrando o que já descobriu em uma memória própria \cite{guo2025repoaudit}.
+Os sistemas multi-agentes levam essa ideia adiante, decompondo uma tarefa complexa entre agentes coordenados, cada um responsável por uma subtarefa localizada, o que também oferece um meio de integrar ferramentas externas e fluxos de trabalho estruturados \cite{li2026llmbased}.}
 \par
-Em um \textit{framework} multi-agente fundamentado em LLMs, o conhecimento do modelo de base é particionado: cada agente atua com instruções e metas específicas (o \textit{system prompt}) \cite{russell2020artificial}.
-A operação colaborativa de múltiplos agentes LLM atenua o risco de alucinações e o gargalo das janelas de contexto, pois o problema global é fracionado em sub-tarefas iterativas de resolução mais simples e verificável.
+\antigo{Em um \itshape framework\upshape{} multi-agente fundamentado em LLMs, o conhecimento do modelo de base é particionado: cada agente atua com instruções e metas específicas (o \itshape system prompt\upshape) \cite{russell2020artificial}.
+A operação colaborativa de múltiplos agentes LLM atenua o risco de alucinações e o gargalo das janelas de contexto, pois o problema global é fracionado em sub-tarefas iterativas de resolução mais simples e verificável.}
+\novo{Em um \textit{framework} multi-agente fundamentado em LLMs, o mesmo modelo de base pode ser usado por vários agentes, que se diferenciam pelas instruções e metas específicas fornecidas a cada um no \textit{prompt}.
+Os trabalhos analisados indicam dois benefícios dessa divisão.
+O primeiro diz respeito à janela de contexto: como cada agente trata apenas uma parte do problema, nenhum deles precisa receber a base de código inteira; o RepoAudit, por exemplo, analisa uma função por vez e recupera sob demanda apenas os trechos necessários \cite{guo2025repoaudit}.
+O segundo diz respeito às alucinações: o resultado de um agente pode ser conferido por outro componente antes de ser aceito, como no módulo validador do RepoAudit, que verifica os fatos de fluxo de dados levantados pelo LLM para reduzir falsos positivos \cite{guo2025repoaudit}, e no agente de triagem do KNighter, que descarta alarmes falsos produzidos pelos verificadores gerados \cite{yang2025knighter}.}
 
 \subsection{Métricas de Avaliação}
 \label{sec:metricasavaliacao}
@@ -1081,6 +1158,7 @@ Será analisado o número de consumo de \textit{tokens} processados nas entradas
 Cada um deles atribui à LLM um papel diferente: sintetizar verificadores para um analisador existente \cite{yang2025knighter}, gerar regras para o SemGrep \cite{hou2025generation} ou auditar diretamente o repositório por meio de um agente autônomo \cite{guo2025repoaudit}.}
 
 \subsection{Trabalho 1: \textit{KNighter: Transforming Static Analysis with LLM-Synthesized Checkers} \cite{yang2025knighter}}
+\label{sec:knighter}
 \par
 O trabalho de \citeonline{yang2025knighter} é considerado o estudo pioneiro para a área de Analisadores Estáticos Automatizados.
 Publicado em SOSP 25 \textit{(ACM SIGOPS 31st Symposium on Operating Systems Principles)}, em Seul, República da Coreia.
@@ -1359,7 +1437,8 @@ Para facilitar essa análise, a Tabela \ref{tab:trabalhosrelacionados} sintetiza
 \par
 Este capítulo apresenta a proposta de desenvolvimento deste trabalho, detalhando a arquitetura do sistema, as decisões metodológicas, o planejamento experimental e o cronograma de execução previstos para TCC2. 
 Expandindo como será realizada cada etapa da solução, bem como serão apresentados prazos para cada fase.
-Em sincronia com a proposta de pesquisa, conforme orientado por \citeonline{Wazlawick2020}, com o foco está na especificação precisa do que será implementado e avaliado.
+\antigo{Em sincronia com a proposta de pesquisa, conforme orientado por \citeonline{Wazlawick2020}, com o foco está na especificação precisa do que será implementado e avaliado.}
+\novo{Em sincronia com a proposta de pesquisa, o foco está na especificação precisa do que será implementado e avaliado \cite{Wazlawick2020}.}
 
 % ---------------------------------------------------------------
 \section{Metodologia da pesquisa}
@@ -1454,13 +1533,275 @@ Essa decisão visa viabilizar a execução do \textit{framework} em infraestrutu
     \label{fig:quartoagente}
 \end{figure}
 
+\begingroup\color{red}
+\subsection{Arquitetura efetivamente implementada}
+\label{sec:arquiteturaimplementada}
+\par
+Durante a implementação, a arquitetura de quatro agentes descrita nesta seção foi consolidada em um ciclo mais enxuto, definido empiricamente ao longo dos experimentos.
+Em vez de quatro agentes LLM distintos operando em sequência fixa, o sistema implementado estrutura-se em dois papéis centrais executados por modelos de linguagem -- \textbf{gerador} e \textbf{corretor} -- e um componente determinístico, o \textbf{\textit{gate} de avaliação}, responsável por validar sintaticamente, executar e avaliar quantitativamente cada regra candidata.
+\par
+O papel de \textbf{gerador} corresponde, em essência, à fusão dos antigos Agentes \#1 e \#2 (análise/abstração e síntese de sintaxe): a partir dos exemplos de código vulnerável e seguro de um CWE, o gerador escreve diretamente a regra candidata, no formato de saída configurado (Seção \ref{sec:formatosregras}).
+O \textit{gate}, por sua vez, substitui a função de validação originalmente atribuída ao Agente \#3, porém de forma inteiramente determinística: um módulo em \textit{Python} normaliza a resposta do modelo, verifica a validade estrutural da regra (posicionamento correto dos operadores do SemGrep, presença de ao menos um matizador de alto nível, terminação de instruções em C), aplica uma checagem lexical (\textit{lint}) que rejeita regras que reutilizem identificadores específicos dos exemplos de treinamento em vez de metavariáveis, executa o motor do SemGrep sobre os arquivos de treinamento e computa \textit{recall}, precisão e taxa de falsos positivos.
+\par
+O papel de \textbf{corretor} herda a função reativa do antigo Agente \#3: recebe a regra candidata e o relatório de erros ou métricas do \textit{gate} e produz uma nova versão da regra, em um ciclo iterativo limitado a um número configurável de tentativas (até seis, em vez das três originalmente previstas, valor que se mostrou necessário para regras mais complexas).
+Uma regra é considerada \textbf{aprovada} quando, no conjunto de treinamento, atinge \textit{recall} mínimo de 50\%, não produz nenhum falso positivo nos casos sintéticos do Juliet Test Suite e não ultrapassa 0,1 alertas por mil linhas de código (KLOC) ao ser executada sobre uma base de código real assumida como correta (Seção \ref{sec:protocoloavaliacao}).
+Caso o orçamento de tentativas se esgote sem aprovação, a melhor tentativa observada é mantida apenas para fins de avaliação no conjunto de teste, não sendo incorporada ao conjunto final de regras.
+\par
+Dois papéis adicionais, inspirados na função de consolidação do antigo Agente \#4, foram implementados como mecanismos opcionais e avaliados experimentalmente: o \textbf{crítico}, que revisa uma regra reprovada e explica textualmente a causa provável da falha antes que o corretor atue; e o \textbf{fusor} (\textit{merger}), que combina a regra de melhor desempenho com a regra mais ``silenciosa'' (menor taxa de falsos positivos) obtida ao longo das tentativas, em uma tentativa final de síntese.
+Complementarmente, três mecanismos de controle foram avaliados: o \textbf{\textit{guard}}, que impede que uma correção substitua a melhor regra já encontrada caso a nova versão apresente pontuação inferior; o \textbf{\texttt{project\_apis}}, que insere no \textit{prompt} os nomes das funções de memória próprias do projeto-alvo; e o parâmetro de \textbf{modo de exemplos} (\texttt{example\_mode}), que determina o que é mostrado ao gerador -- os achados do detector (\texttt{findings}, padrão), pares de código vulnerável/seguro do \textit{dataset} (\texttt{pairs}), achados da análise de grafos de eventos (\texttt{graph}) ou nenhum exemplo (\texttt{none}).
+
+\subsection{Formatos de saída das regras}
+\label{sec:formatosregras}
+\par
+Ao longo dos experimentos, cinco formatos distintos de saída foram implementados e avaliados para a regra candidata, cada um restringindo de forma diferente a liberdade do modelo gerador:
+\begin{enumerate}
+  \item \textbf{\texttt{yaml}}: o modelo escreve livremente a regra completa na gramática YAML do SemGrep, sem restrição estrutural além da instrução textual do \textit{prompt};
+  \item \textbf{\texttt{spec}}: o modelo escreve uma especificação em JSON dos padrões, posteriormente traduzida deterministicamente para a gramática do SemGrep;
+  \item \textbf{\texttt{template}}: o modelo preenche uma estratégia pré-definida de rastreamento de contaminação (\textit{taint}), representada como um JSON de preenchimento, reduzindo a liberdade de síntese à escolha dos padrões e nomes de funções relevantes;
+  \item \textbf{\texttt{form}}: o modelo preenche as lacunas de uma regra em modo \textit{taint} (fonte, desinfetantes e usos perigosos de uma variável), com o decodificador do modelo restrito por uma gramática formal do esqueleto, impedindo a geração de qualquer estrutura fora do esquema previsto;
+  \item \textbf{\texttt{formsearch}}: equivalente ao anterior, porém para o modo de busca (\textit{search}) do SemGrep, utilizado quando o CWE-alvo não admite um ponto de partida de contaminação (como uma declaração de variável sem valor atribuído).
+\end{enumerate}
+\par
+Para os formatos \texttt{form}, \texttt{formsearch} e \texttt{yaml}, foi implementado adicionalmente um modo de correção alternativo, denominado \texttt{field\_correct}: em vez de reescrever a regra inteira a cada tentativa de correção, o corretor responde apenas com o novo valor de um único campo (um padrão, uma exclusão ou um padrão de exclusão de contexto), escolhido ciclicamente a cada tentativa, enquanto o restante da regra permanece inalterado.
+Esse mecanismo busca contornar um comportamento recorrente observado nos modelos de menor porte: ao receber a mesma mensagem de erro repetidamente, o modelo tende a reenviar a regra anterior, idêntica, em vez de produzir uma variação (Seção \ref{sec:resultadosfieldcorrect}).
+Uma limitação identificada durante a implementação é que a correção por campo só é aplicável quando a estrutura da regra já é válida; quando o gerador produz uma regra com um erro estrutural (por exemplo, um operador do SemGrep posicionado de forma inválida), o sistema recorre automaticamente à reescrita completa, já que a edição de um único valor não é capaz de corrigir a posição de um operador.
+
+\subsection{Combinações de modelos avaliadas}
+\label{sec:combosmodelos}
+\par
+Para viabilizar a execução do \textit{framework} em \textit{hardware} local e investigar o Objetivo Específico 3 (Seção \ref{sec:objespecifico}), diversas combinações de modelos de linguagem foram configuradas e avaliadas ao longo do trabalho, detalhadas na Tabela \ref{tab:combosmodelos}.
+Todas as combinações utilizam o mesmo modelo de 3 bilhões de parâmetros (Qwen2.5-Coder-3B) na etapa de detecção inicial de vulnerabilidades, variando o modelo responsável pela geração e correção das regras.
+
+\begin{table}[htb]
+    \centering
+    \caption{Combinações de modelos de linguagem avaliadas}
+    \label{tab:combosmodelos}
+    \begin{tabular}{p{1.3cm}p{11.5cm}}
+        \toprule
+        \textbf{Combo} & \textbf{Modelo gerador/corretor} \\
+        \midrule
+        A & Qwen2.5-Coder-3B em todos os papéis \\
+        B & Qwen2.5-Coder-7B \\
+        C & Qwen3-4B-Instruct-2507 \\
+        D & Qwen3-Coder-30B-A3B (\textit{Mixture-of-Experts}, aproximadamente 3 bilhões de parâmetros ativos por \textit{token}, com \textit{offload} parcial para GPU) \\
+        E & Qwen3-Coder-30B-A3B, sem troca de modelos entre papéis \\
+        F & Phi-4-mini \\
+        \bottomrule
+    \end{tabular}
+    \legend{Fonte: Elaborado pelo autor (2026)}
+\end{table}
+
+\par
+A combinação D, apesar de seu custo computacional mais elevado e tempo de inferência por \textit{token} consideravelmente maior, demonstrou-se necessária para a obtenção dos melhores resultados do trabalho (Seção \ref{sec:resultadoscwe416}): a combinação C, baseada em um modelo de 4 bilhões de parâmetros, não foi capaz de reproduzir os ganhos obtidos pelo mecanismo \texttt{field\_correct}, evidenciando uma relação direta entre a capacidade do modelo gerador e a eficácia de mecanismos de correção mais refinados.
+
+\subsection{Protocolo de avaliação}
+\label{sec:protocoloavaliacao}
+\par
+A avaliação de cada regra sintetizada segue um protocolo de validação cruzada por dobras (\textit{k-fold cross-validation}), com $k=5$, estratificado pelas variantes de fluxo do Juliet Test Suite, de forma que cada variante sintática de um CWE seja utilizada no conjunto de teste exatamente uma vez ao longo das cinco dobras.
+Para mitigar o efeito de variação amostral identificado ao longo do trabalho (Seção \ref{sec:licaometodologica}), cada configuração experimental foi repetida com múltiplas sementes (\textit{seeds}) de particionamento, inicialmente duas e, nas configurações consideradas mais relevantes, estendidas a cinco.
+\par
+Além da avaliação sobre o \textit{dataset} sintético, cada regra candidata é também executada sobre uma base de código real de um projeto \textit{open-source} maduro (o repositório \textit{git/git}), assumida como funcionalmente correta.
+Essa segunda avaliação, denominada \textit{gate} de negativos do mundo real, quantifica a taxa de alertas por mil linhas de código (KLOC) que a regra dispara sobre código idiomático e não-vulnerável, funcionando como um critério de qualidade mais rigoroso e realista do que a simples ausência de falsos positivos no \textit{dataset} sintético: uma regra pode atingir zero falsos positivos nos casos de teste do Juliet e, ainda assim, disparar constantemente sobre código real, caso seus padrões sejam genéricos ou mal direcionados.
+Uma regra somente é considerada aprovada quando atinge \textit{recall} mínimo de 50\% no conjunto de treinamento, nenhum falso positivo no Juliet Test Suite e taxa de alerta no mundo real igual ou inferior a 0,1 alertas por KLOC.
+\par
+Durante a execução dos experimentos, identificou-se e corrigiu-se uma falha de robustez no \textit{gate}: regras candidatas com padrões patologicamente ineficientes ocasionalmente faziam o motor do SemGrep travar ou encerrar de forma anômala ao ser executado sobre a base de código real, interrompendo todo o processo de validação cruzada em andamento.
+A correção implementada trata esse travamento ou encerramento anômalo como um erro comum de regra inválida, permitindo que o ciclo gerador-corretor prossiga normalmente para a próxima tentativa, em vez de encerrar o processo inteiro.
+\endgroup
+
 % ---------------------------------------------------------------
 \section{Experimentos e cenário de testes}
 \label{sec:experimentos}
+\begingroup\color{red}
+\par
+Os experimentos conduzidos na segunda etapa deste trabalho têm como objetivo avaliar empiricamente a arquitetura descrita na Seção \ref{sec:implementacao} sobre cinco categorias de vulnerabilidade (CWE-401, CWE-415, CWE-416, CWE-457 e CWE-476, descritas na Seção \ref{sec:cwes}), variando o formato de saída da regra, a combinação de modelos e os mecanismos opcionais do corretor (Seção \ref{sec:arquiteturaimplementada}).
+Cada rodada experimental segue o protocolo de avaliação descrito na Seção \ref{sec:protocoloavaliacao}, com os arquivos de treinamento e teste extraídos do Juliet Test Suite \cite{nistsard112juliet} e a base de código real do repositório \textit{git/git} utilizada como fonte de negativos do mundo real.
+\par
+O planejamento experimental organizou-se em quatro rodadas sucessivas, cada uma definida e registrada previamente à sua execução, seguindo o princípio de \textit{Design Science Research} de avaliação rigorosa e documentada \cite{hevner2004design}.
+
+\subsection{Rodada 1: viabilidade do formato de preenchimento de lacunas (CWE-457)}
+\label{sec:rodada1}
+\par
+A primeira rodada experimental teve como objetivo avaliar se restringir a liberdade sintática do modelo gerador, por meio dos formatos \texttt{form} e \texttt{formsearch} (Seção \ref{sec:formatosregras}), produz regras mais eficazes do que o formato livre \texttt{yaml} para o CWE-457 (uso de variável não inicializada), um caso nunca antes avaliado pelo \textit{pipeline}.
+\par
+Antes da execução, dois fatos foram estabelecidos manualmente, a partir de regras escritas pelo próprio autor sobre os arquivos do Juliet Test Suite: (i) em modo \textit{taint}, uma declaração de variável sem atribuição de valor não é capaz de iniciar o rastreamento de contaminação no motor do SemGrep \textit{Open Source}, de forma que qualquer regra no formato \texttt{form} está estruturalmente limitada a 0\% de \textit{recall} para este CWE; e (ii) uma regra em modo de busca, combinando a declaração, qualquer código intermediário e um uso posterior da variável, excluindo o mesmo padrão quando precedido de uma atribuição, atinge um \textit{recall} de aproximadamente 31\% sem falsos positivos nos primeiros 120 pares de arquivos do Juliet, valor que serve como teto de referência para a capacidade do próprio formato, independentemente do modelo utilizado.
+\par
+Os quatro formatos (\texttt{yaml}, \texttt{template}, \texttt{form} e \texttt{formsearch}) foram avaliados na combinação C (Qwen3-4B-Instruct), com validação cruzada de cinco dobras, duas sementes e até seis tentativas de correção por dobra.
+
+\subsection{Rodadas 2 a 4: mecanismo \texttt{field\_correct} (CWE-416 e CWE-415)}
+\label{sec:rodadas234}
+\par
+As três rodadas subsequentes investigaram o mecanismo de correção por campo (\texttt{field\_correct}, Seção \ref{sec:formatosregras}) sobre os formatos \texttt{form} e \texttt{formsearch}, aplicados ao CWE-416 (uso após liberação) e ao CWE-415 (liberação dupla), dois CWEs cuja semântica se encaixa naturalmente em uma estrutura de rastreamento de contaminação (fonte: \texttt{free(\$P)}; uso perigoso: qualquer acesso posterior ao ponteiro, no caso do CWE-416, ou uma segunda chamada a \texttt{free(\$P)}, no caso do CWE-415).
+\par
+A Rodada 2 avaliou os quatro arranjos (\texttt{form} e \texttt{formsearch}, com e sem \texttt{field\_correct}) para ambos os CWEs na combinação C; a Rodada 3 repetiu exatamente os mesmos dezesseis experimentos na combinação D (Qwen3-Coder-30B-A3B), isolando o efeito do porte do modelo gerador; a Rodada 4 investigou o acúmulo do \texttt{field\_correct} com o parâmetro \texttt{example\_mode=pairs} (Seção \ref{sec:arquiteturaimplementada}), ambos considerados, isoladamente, os mecanismos mais promissores identificados até então.
+No total, 48 execuções de validação cruzada foram realizadas ao longo destas três rodadas.
+
+\subsection{Revisão da configuração de referência e rodada final (CWE-416)}
+\label{sec:rodadafinal}
+\par
+Paralelamente às rodadas anteriores, um levantamento consolidado de todas as 120 execuções de validação cruzada realizadas até então foi conduzido, identificando a única configuração já aprovada pelo \textit{gate} ao longo de todo o trabalho: a combinação D, formato \texttt{template}, com o parâmetro \texttt{example\_mode=pairs} (pares de código vulnerável e seguro apresentados ao gerador, em vez dos achados do detector), aplicada ao CWE-416, aprovando duas das cinco dobras na primeira semente avaliada.
+\par
+A partir desse achado, conduziu-se uma rodada final de refinamento: (i) extensão da configuração \texttt{pairs} para cinco sementes, de forma a avaliar sua estabilidade; (ii) combinação de \texttt{pairs} com os mecanismos \texttt{guard} (nunca piorar a melhor regra já encontrada) e \texttt{project\_apis} (nomes de funções do projeto-alvo no \textit{prompt}); e, por fim, (iii) uma configuração isolando apenas o mecanismo \texttt{guard}, sem o \texttt{project\_apis}, também estendida a cinco sementes.
+\endgroup
 
 % ---------------------------------------------------------------
 \section{Resultados e análises}
 \label{sec:resultados}
+\begingroup\color{red}
+\par
+Esta seção apresenta e discute os resultados quantitativos obtidos nas quatro rodadas experimentais descritas na Seção \ref{sec:experimentos}.
+A Tabela \ref{tab:resumocwes} sintetiza o melhor resultado obtido para cada categoria de vulnerabilidade avaliada ao longo do trabalho.
+
+\begin{table}[htb]
+    \centering
+    \caption{Síntese dos melhores resultados por CWE}
+    \label{tab:resumocwes}
+    \begin{tabular}{p{1.4cm}p{6.5cm}p{2.0cm}p{2.6cm}}
+        \toprule
+        \textbf{CWE} & \textbf{Melhor configuração} & \textbf{\textit{Recall}} & \textbf{Dobras aprovadas} \\
+        \midrule
+        CWE-416 & Combo D, \texttt{template}, \texttt{pairs} + \texttt{guard} & 89,2\%--100\% & 2 de 5 sementes* \\
+        CWE-415 & Combo D, \texttt{yaml}, \texttt{example\_mode=graph} & 43,3\%--76,3\% & 0 de 5 \\
+        CWE-401 & Combo G, execução isolada (sem validação cruzada) & 79,47\% & -- \\
+        CWE-476 & Combo D, \texttt{yaml}, \texttt{example\_mode=graph} & 22,9\%--24,8\% & 0 de 2 \\
+        CWE-457 & Combo C, \texttt{formsearch} & 0\%--18,75\% & 0 de 2 \\
+        \bottomrule
+    \end{tabular}
+    \legend{Fonte: Elaborado pelo autor (2026). *Cada semente aprovada contribui com, no mínimo, uma de cinco dobras.}
+\end{table}
+
+\subsection{CWE-457: um alvo estruturalmente inadequado}
+\label{sec:resultadoscwe457}
+\par
+Nenhum dos quatro formatos avaliados para o CWE-457 obteve aprovação em qualquer dobra, nas duas sementes testadas (20 execuções no total).
+O formato \texttt{form}, em modo \textit{taint}, confirmou a limitação estrutural identificada previamente à execução (Seção \ref{sec:rodada1}): por não haver atribuição de valor em uma declaração de variável, o motor do SemGrep não é capaz de iniciar o rastreamento de contaminação a partir dela, limitando o \textit{recall} de toda regra desse formato a 0\%, independentemente da qualidade dos demais campos preenchidos pelo modelo.
+\par
+Os formatos \texttt{yaml} e \texttt{template} produziram, na maioria das dobras, regras sintaticamente válidas e aceitas sem erro pelo motor do SemGrep, porém completamente inertes: \textit{recall} de 0\% e nenhum falso positivo, indicando que o modelo de 4 bilhões de parâmetros utilizado (combinação C) não foi capaz de sintetizar um padrão que, de fato, correspondesse ao uso de uma variável não inicializada em código C genérico.
+Apenas o formato \texttt{formsearch} apresentou alguma capacidade de detecção, atingindo 18,75\% de \textit{recall} em uma dobra, acompanhado de 288 falsos positivos, e 0\% nas demais, com taxa de alerta no mundo real entre 0,22 e 0,48 alertas por KLOC -- acima do limite de 0,1 estabelecido pelo \textit{gate}.
+\par
+Interpreta-se este resultado não como uma falha do mecanismo de geração em si, mas como evidência de que o CWE-457 é um alvo inadequado para a abordagem proposta nas condições avaliadas: o teto de \textit{recall} de aproximadamente 31\% obtido manualmente, antes mesmo da execução de qualquer modelo (Seção \ref{sec:rodada1}), já está abaixo do limiar mínimo de 50\% exigido pelo \textit{gate}, e o modelo de linguagem utilizado sequer se aproximou desse teto já conhecido.
+
+\subsection{Mecanismo \texttt{field\_correct}: um ganho real, porém inconsistente}
+\label{sec:resultadosfieldcorrect}
+\par
+As três rodadas dedicadas ao mecanismo de correção por campo (48 execuções de validação cruzada, Seção \ref{sec:rodadas234}) revelam um padrão de efeito real, porém não generalizável.
+Na combinação C (4 bilhões de parâmetros), o mecanismo não produziu nenhuma diferença mensurável de \textit{recall} em relação à reescrita completa da regra, em nenhum dos quatro arranjos avaliados.
+\par
+Na combinação D (30 bilhões de parâmetros, \textit{Mixture-of-Experts}), o efeito foi expressivo em um único caso: para o CWE-416 no formato \texttt{form}, o \texttt{field\_correct} elevou o \textit{recall} de 0\% para a faixa de 40\% a 60\%, ao custo de uma taxa de falsos positivos de 20 a 70 vezes superior ao limite de 0,1 alertas por KLOC do \textit{gate}.
+Para o formato \texttt{formsearch} do mesmo CWE, nenhum efeito foi observado, com ou sem o mecanismo.
+Para o CWE-415, o efeito foi misto: em alguns casos, o \texttt{field\_correct} reduziu substancialmente o número de falsos positivos sem alterar de forma relevante o \textit{recall} (por exemplo, de 24 para 0 falsos positivos no formato \texttt{formsearch}, mantendo \textit{recall} semelhante); em outros, o mecanismo piorou o resultado, chegando a reduzir o \textit{recall} de 63,8\% para 20,6\% em uma das sementes do formato \texttt{yaml}.
+\par
+A combinação do \texttt{field\_correct} com o parâmetro \texttt{example\_mode=pairs} (Rodada 4) não superou nenhuma das duas configurações isoladamente, e revelou um efeito adicional: o parâmetro \texttt{pairs}, quando aplicado ao formato \texttt{yaml} do CWE-415, zerou o \textit{recall} em ambas as sementes testadas, independentemente do \texttt{field\_correct}, evidenciando que nem todo mecanismo validado para um CWE se generaliza para outro.
+\par
+Conclui-se que o \texttt{field\_correct} não constitui uma melhoria geral do corretor, mas sim um mecanismo cujo benefício depende da combinação específica de formato, CWE e capacidade do modelo gerador: ele tende a reduzir o ruído de regras já próximas de uma solução estrutural correta, mas não é capaz, por si só, de corrigir uma regra cuja escolha inicial de fonte e sumidouro de contaminação esteja fundamentalmente equivocada.
+
+\subsection{CWE-416: da aprovação isolada à melhoria consistente}
+\label{sec:resultadoscwe416}
+\par
+O levantamento das 120 execuções de validação cruzada acumuladas ao longo do trabalho revelou que apenas uma configuração jamais obteve aprovação do \textit{gate}: a combinação D, no formato \texttt{template}, com o parâmetro \texttt{example\_mode=pairs}, aprovando duas das cinco dobras da sua primeira semente (\textit{recall} de 77,6\% e precisão de 73,5\% no conjunto de teste), porém nenhuma dobra na segunda semente (apesar de um \textit{recall} de 97,1\% nesta última).
+\par
+A extensão dessa configuração para cinco sementes (Tabela \ref{tab:cwe416evolucao}) revelou um padrão relevante: o \textit{recall} manteve-se consistentemente elevado em todas as sementes (77,6\% a 97,8\%), não sendo, portanto, instável.
+O que variou entre as sementes foi o número absoluto de falsos positivos no conjunto de teste (84 a 320 ocorrências), situado próximo ao limiar de corte do \textit{gate}; apenas a primeira semente obteve uma contagem suficientemente baixa para ser aprovada.
+Conclui-se que a aprovação original não foi resultado de uma sorte de \textit{recall}, mas de uma sorte relacionada a exatamente onde a contagem de falsos positivos daquela semente específica recaiu em relação a um corte rígido.
+\par
+A combinação do parâmetro \texttt{pairs} com os mecanismos \texttt{guard} e \texttt{project\_apis} elevou ainda mais o \textit{recall} (80,3\% a 97,1\% em duas sementes), porém às custas de um aumento severo de ruído (619 a 799 falsos positivos; 25,6 a 47,3 alertas por KLOC no mundo real), não resultando em nenhuma dobra aprovada.
+\par
+Por fim, isolando apenas o mecanismo \texttt{guard} (sem o \texttt{project\_apis}) e estendendo para cinco sementes, obteve-se o melhor resultado do trabalho: duas das cinco sementes passaram a obter ao menos uma dobra aprovada (contra apenas uma das cinco sementes da configuração \texttt{pairs} isolada), com uma faixa de \textit{recall} mais concentrada (89,2\% a 100\%).
+Esse resultado indica que o parâmetro \texttt{project\_apis} era o principal responsável pelo ruído adicional observado, e que o mecanismo \texttt{guard}, isoladamente, contribui de fato para a confiabilidade da aprovação, sem comprometer o \textit{recall} da configuração de referência.
+
+\begin{table}[htb]
+    \centering
+    \caption{Evolução da configuração de referência para o CWE-416 (combo D, formato \texttt{template}, cinco sementes)}
+    \label{tab:cwe416evolucao}
+    \begin{tabular}{p{4.6cm}p{2.4cm}p{2.1cm}p{2.3cm}}
+        \toprule
+        \textbf{Configuração} & \textbf{\textit{Recall} (faixa)} & \textbf{FP (faixa)} & \textbf{Sementes com aprovação} \\
+        \midrule
+        \texttt{pairs} & 77,6\%--97,8\% & 84--320 & 1 de 5 \\
+        \texttt{pairs} + \texttt{guard} + \texttt{project\_apis} & 80,3\%--97,1\% & 619--799 & 0 de 2 \\
+        \texttt{pairs} + \texttt{guard} & 89,2\%--100\% & 12--216 & 2 de 5 \\
+        \bottomrule
+    \end{tabular}
+    \legend{Fonte: Elaborado pelo autor (2026)}
+\end{table}
+
+\subsection{CWE-415 e a necessidade metodológica de múltiplas sementes}
+\label{sec:licaometodologica}
+\par
+A configuração de referência do CWE-415 (combinação D, formato \texttt{yaml}, \texttt{example\_mode=graph}) nunca obteve aprovação do \textit{gate}, porém suas duas sementes originais apresentaram \textit{recall} de 63,8\% e 64,8\%, valores próximos entre si que, isoladamente, sugeririam um resultado estável em torno de 64\%.
+A extensão para cinco sementes revelou uma realidade distinta: 63,8\%, 64,8\%, 47,3\%, 43,3\% e 76,3\%, uma amplitude de 33 pontos percentuais.
+\par
+Esse achado, somado ao caso do CWE-416 descrito na Seção \ref{sec:resultadoscwe416}, evidencia uma lição metodológica central deste trabalho: a variação de resultado entre sementes de particionamento foi, em diversos casos, maior do que o efeito de qualquer mecanismo experimental avaliado (formato de saída, \texttt{field\_correct}, \texttt{example\_mode} ou combinação de modelo).
+Em um caso específico, a configuração do formato \texttt{form} com \texttt{field\_correct} para o CWE-416 variou de 0\% a 60\% de \textit{recall} entre duas sementes da mesma configuração exata.
+Com apenas duas sementes, não é possível distinguir um efeito real do ruído amostral inerente ao processo de particionamento e amostragem de exemplos; a prática adotada na rodada final deste trabalho (cinco sementes por configuração relevante) é recomendada como padrão mínimo para qualquer extensão futura deste \textit{framework}, mesmo ao custo de uma redução no número de combinações exploradas por unidade de tempo computacional disponível.
+
+\subsection{O que não foi alcançado: síntese das tentativas sem sucesso e alternativas}
+\label{sec:tentativassemsucesso}
+\par
+É necessário reconhecer, com a mesma transparência empregada na apresentação dos resultados positivos, que diversas tentativas conduzidas ao longo deste trabalho não alcançaram o resultado esperado.
+O Objetivo Geral desta pesquisa (Seção \ref{sec:objgeral}) estabeleceu a meta de demonstrar desempenho superior às abordagens tradicionais em, no mínimo, cinco categorias de vulnerabilidade.
+Ao final das quatro rodadas experimentais, apenas o CWE-416 obteve alguma dobra efetivamente aprovada pelo \textit{gate}, e de forma inconsistente entre sementes (Seção \ref{sec:resultadoscwe416}); o CWE-415 aproximou-se, sem jamais ser aprovado; e os CWE-401, CWE-457 e CWE-476 permaneceram com desempenho insuficiente ou pouco explorado.
+Esta subseção consolida essas tentativas malsucedidas, discute possíveis causas e contrapõe o que foi tentado às estratégias adotadas pelos trabalhos correlatos apresentados na Seção \ref{sec:trabalhosrelacionados}.
+\par
+\textbf{(i) O mecanismo \texttt{field\_correct} não se generalizou.}
+A expectativa inicial era de que restringir a correção a um único campo por tentativa reduzisse o comportamento, observado nos modelos menores, de reenviar a mesma regra reprovada repetidamente.
+O mecanismo cumpriu esse papel pontual, mas não se tornou uma melhoria geral do corretor (Seção \ref{sec:resultadosfieldcorrect}): sua eficácia dependeu de uma combinação específica e imprevisível de formato, CWE e porte do modelo gerador, chegando a piorar resultados em alguns arranjos.
+Isso indica que o problema central dos modelos menores -- a dificuldade de escolher corretamente a fonte e o sumidouro de contaminação de uma regra -- não é um problema de granularidade de edição, mas de compreensão semântica da vulnerabilidade, algo que uma correção localizada por campo não é capaz de suprir.
+Uma alternativa não explorada seria aplicar o mecanismo de \textit{checker synthesis} orientado por histórico de \textit{patches} de \citeonline{yang2025knighter} (KNighter) já na etapa de geração, e não apenas de correção, de forma que a escolha inicial de fonte e sumidouro já nasça ancorada em exemplos reais de correção do próprio CWE, e não apenas na descrição textual do achado do detector.
+\par
+\textbf{(ii) O CWE-415 nunca foi aprovado pelo \textit{gate}, apesar de \textit{recall} relevante.}
+Mesmo na sua melhor configuração (\texttt{yaml}, \texttt{example\_mode=graph}, combinação D), o CWE-415 (liberação dupla de memória) jamais atingiu simultaneamente \textit{recall} mínimo de 50\% e taxa de falso positivo no mundo real abaixo de 0,1 alertas por KLOC, em nenhuma das cinco sementes avaliadas (Seção \ref{sec:licaometodologica}).
+Diferentemente do CWE-457 (Seção \ref{sec:resultadoscwe457}), aqui não há uma limitação estrutural conhecida do motor do SemGrep: a dificuldade parece residir na capacidade do modelo gerador de distinguir, de forma suficientemente genérica, um padrão de dupla liberação de uma liberação legítima e única, sem recorrer a nomes de variáveis ou funções específicos dos exemplos de treinamento -- o mesmo tipo de raciocínio superficial de fluxo de dados apontado por \citeonline{li2026llmbased} como causa-raiz predominante de falsos positivos em ferramentas baseadas em LLMs, tanto quanto em ferramentas tradicionais.
+Como alternativa, a abordagem de \citeonline{guo2025repoaudit} (RepoAudit), que mantém memória entre análises e valida cada candidato a partir da sintaxe concreta do código (via \textit{tree-sitter}) em vez de depender inteiramente de uma regra estática generalizada previamente, poderia reduzir esse tipo de erro ao analisar cada ocorrência em seu contexto real, ao custo de abandonar o objetivo de produzir uma regra reutilizável e de baixo custo de inferência recorrente, que é a proposta central deste trabalho (Seção \ref{sec:justificativa}).
+\par
+\textbf{(iii) Combinar os dois melhores mecanismos conhecidos piorou o resultado.}
+A tentativa de somar o único parâmetro já aprovado (\texttt{example\_mode=pairs}) aos mecanismos de maior \textit{recall} já observados (\texttt{guard} e \texttt{project\_apis}) partiu da hipótese, razoável, de que efeitos positivos isolados se somariam.
+O resultado mostrou o oposto: a taxa de falsos positivos aumentou em uma ordem de grandeza (Tabela \ref{tab:cwe416evolucao}), e o isolamento posterior do \texttt{project\_apis} como variável causadora só foi possível por meio de uma rodada adicional dedicada exclusivamente a essa decomposição.
+Esse resultado é consistente com o próprio achado de \citeonline{li2026llmbased} de que ferramentas baseadas em LLM, mesmo as mais eficazes, mantêm taxas médias de falsos positivos superiores a 85\% em avaliações de larga escala: o ganho de contexto (mais informação no \textit{prompt}, como os nomes de funções do projeto) não é garantia de ganho de precisão, podendo inclusive ser contraproducente quando o contexto adicional não está suficientemente alinhado à semântica da vulnerabilidade -- um risco já discutido teoricamente na Seção \ref{sec:contexto} ao abordar os limites do \textit{self-attention} sobre janelas de contexto extensas \cite{vaswani2017attention}.
+\par
+\textbf{(iv) O CWE-457 permanece sem solução dentro da abordagem proposta.}
+Diferentemente dos casos anteriores, aqui a causa raiz é conhecida e documentada antes mesmo da execução de qualquer experimento (Seção \ref{sec:rodada1}): o motor do SemGrep \textit{Open Source} não inicia rastreamento de contaminação a partir de uma declaração sem atribuição de valor.
+Não se trata, portanto, de uma falha do \textit{framework} proposto, mas de uma limitação da ferramenta-alvo (SemGrep) para este CWE específico em sua variante \textit{Open Source}.
+Duas alternativas foram cogitadas, porém não implementadas por estarem fora do escopo de síntese de regras SemGrep definido neste trabalho (Seção \ref{sec:justificativa}): (a) a utilização da versão comercial do SemGrep (\textit{Semgrep Pro}), cujo motor de fluxo de dados interprocedural é mais completo; e (b) a geração de um analisador dedicado e independente do SemGrep, nos moldes do \textit{checker} standalone sintetizado por \citeonline{yang2025knighter}, que não herda as mesmas restrições de modo \textit{taint} por não depender da infraestrutura do SemGrep.
+\par
+Em conjunto, esses quatro casos sugerem uma conclusão mais ampla: a comparação com \citeonline{hou2025generation}, \citeonline{yang2025knighter} e \citeonline{li2026llmbased} indica que a dificuldade central deste trabalho -- equilibrar \textit{recall} e taxa de falsos positivos em código real -- não é exclusiva da arquitetura aqui proposta, mas uma limitação recorrente relatada de forma consistente em toda a literatura revisada sobre análise estática assistida por LLMs.
+A diferença observada entre os trabalhos correlatos e esta pesquisa está menos no problema em si e mais na escala de validação: enquanto \citeonline{li2026llmbased} e \citeonline{guo2025repoaudit} avaliam dezenas de repositórios reais com revisão manual extensiva, este trabalho validou um número reduzido de combinações sobre um único repositório de negativos (\textit{git/git}) e o \textit{dataset} sintético do Juliet Test Suite, o que limita a generalização dos resultados aqui obtidos e é retomado como limitação formal no Capítulo \ref{cap:conclusao}.
+
+\subsection{Comparação com um analisador estático tradicional}
+\label{sec:comparacaotradicional}
+\par
+Para avaliar diretamente o Objetivo Específico 2 (Seção \ref{sec:objespecifico}) e a Hipótese de pesquisa (Seção \ref{sec:hipotese}), buscou-se uma linha de base de comparação externa ao \textit{framework} proposto.
+O registro público (\textit{registry}) gratuito do SemGrep, acessível sem autenticação, disponibiliza o pacote \texttt{r/c} (73 regras para a linguagem C, das quais 16 aplicáveis ao \textit{dataset} utilizado), do qual duas regras mostraram-se diretamente relevantes para os CWEs avaliados neste trabalho: \texttt{c.lang.security.function-use-after-free}, para o CWE-416, e \texttt{c.lang.security.double-free} (que, nos arquivos avaliados, ocorre acompanhada de ocorrências adicionais da regra de uso após liberação), para o CWE-415.
+Nenhuma regra relevante foi encontrada no mesmo pacote para o CWE-401, o CWE-457 ou o CWE-476 -- para o primeiro, a única regra disparada (detecção insegura de funções de cópia de \textit{string}) não corresponde ao padrão de vazamento de memória avaliado; para os demais dois, nenhuma regra do pacote foi acionada em nenhum arquivo do \textit{dataset} --, de forma que a comparação direta ficou restrita às duas categorias em que o \textit{framework} proposto também obteve os melhores resultados.
+\par
+As regras tradicionais foram executadas sobre a totalidade do subconjunto Juliet rotulado para cada CWE (300 arquivos para o CWE-416, 760 para o CWE-415, divididos igualmente entre código vulnerável e seguro), e seu \textit{recall}, precisão e F1-Score foram calculados pelo mesmo critério de agrupamento por caso de teste utilizado na avaliação das regras sintetizadas (Seção \ref{sec:protocoloavaliacao}).
+A Tabela \ref{tab:comparacaotradicional} apresenta o resultado, contrapondo-o à faixa de valores obtida pela melhor configuração sintetizada de cada CWE ao longo das cinco sementes avaliadas (Seções \ref{sec:resultadoscwe416} e \ref{sec:licaometodologica}).
+
+\begin{table}[htb]
+    \centering
+    \caption{Comparação entre as regras sintetizadas e um analisador tradicional (registro público do SemGrep, pacote \texttt{r/c})}
+    \label{tab:comparacaotradicional}
+    \begin{tabular}{p{1.6cm}p{3.6cm}p{2.3cm}p{2.3cm}p{1.6cm}}
+        \toprule
+        \textbf{CWE} & \textbf{Abordagem} & \textbf{\textit{Recall}} & \textbf{Precisão} & \textbf{F1} \\
+        \midrule
+        \multirow{2}{1.6cm}{CWE-416} & Regra tradicional (\texttt{r/c}) & 17,4\% & 66,7\% & 0,276 \\
+         & Melhor regra sintetizada & 89,2\%--100\% & 56,1\%--92,4\% & 0,72--0,91 \\
+        \midrule
+        \multirow{2}{1.6cm}{CWE-415} & Regra tradicional (\texttt{r/c}) & 28,7\% & 50,0\% & 0,364 \\
+         & Melhor regra sintetizada & 43,3\%--76,3\% & 41,6\%--59,7\% & 0,50--0,63 \\
+        \bottomrule
+    \end{tabular}
+    \legend{Fonte: Elaborado pelo autor (2026). A regra tradicional foi avaliada sobre a totalidade do subconjunto Juliet rotulado do CWE; a regra sintetizada, por validação cruzada de cinco dobras e cinco sementes sobre o conjunto de teste isolado.}
+\end{table}
+
+\par
+Em ambos os CWEs, a melhor configuração sintetizada por este trabalho superou a regra tradicional em \textit{recall} em todas as cinco sementes avaliadas, sem exceção: o menor valor de \textit{recall} obtido pela configuração sintetizada (43,3\%, CWE-415) ainda supera o da regra tradicional para o mesmo CWE (28,7\%); o mesmo padrão se repete, com margem ainda maior, no CWE-416 (menor valor sintetizado de 89,2\% contra 17,4\% da regra tradicional).
+Em F1-Score, a vantagem é igualmente consistente: 0,72 a 0,91 contra 0,276 no CWE-416, e 0,50 a 0,63 contra 0,364 no CWE-415.
+A precisão, por sua vez, apresenta um quadro mais equilibrado -- em algumas sementes a regra tradicional supera a configuração sintetizada (por exemplo, 66,7\% contra 56,1\% na semente de menor precisão do CWE-416), evidenciando que o ganho de \textit{recall} do \textit{framework} proposto não ocorre sem nenhum custo de precisão, ainda que o ganho líquido, medido pelo F1-Score, seja favorável em todas as sementes avaliadas.
+\par
+Interpreta-se este resultado como a evidência mais direta e quantitativa, dentre todas as obtidas neste trabalho, em favor da Hipótese de pesquisa (Seção \ref{sec:hipotese}): nas duas categorias de CWE em que uma regra tradicional comparável pôde ser identificada no registro público e gratuito do SemGrep, a síntese dinâmica de regras por LLMs superou-a de forma consistente em \textit{recall} e F1-Score, confirmando, ainda que não de forma generalizada a todas as cinco categorias originalmente previstas, a premissa central deste trabalho.
+Ressalva-se que a regra tradicional foi avaliada sobre a totalidade do conjunto rotulado, sem necessidade de particionamento (por não ser uma abordagem treinada ou ajustada aos dados), enquanto a regra sintetizada foi avaliada por validação cruzada sobre dados de teste isolados; a comparação, ainda assim, segue o padrão estabelecido na literatura de avaliação empírica de ferramentas de análise estática \cite{li2026llmbased, guo2025repoaudit}.
+\endgroup
 
 % ---------------------------------------------------------------
 \section{Cronograma de trabalho}
@@ -1537,6 +1878,15 @@ O cronograma a seguir está organizado as atividades do TCC2 em 16 semanas, conf
 \section{Contribuições para a Computação}
 
 \section{Limitações e trabalhos futuros}
+\begingroup\color{red}
+\par
+As limitações deste trabalho foram discutidas em detalhe na Seção \ref{sec:tentativassemsucesso}; esta seção as retoma de forma sintética e aponta encaminhamentos concretos para trabalhos futuros.
+\par
+Em primeiro lugar, o Objetivo Geral de demonstrar desempenho superior em, no mínimo, cinco categorias de CWE (Seção \ref{sec:objgeral}) não foi plenamente alcançado: apenas o CWE-416 obteve dobras aprovadas pelo \textit{gate}, e de forma instável entre sementes de particionamento; o CWE-415 chegou perto, sem jamais ser aprovado; e os CWE-401, CWE-457 e CWE-476 não ultrapassaram a fase exploratória.
+Essa limitação é, em si, um resultado relevante: ela indica que a dificuldade relatada pela literatura em equilibrar \textit{recall} e falsos positivos \cite{li2026llmbased} se manifesta igualmente na arquitetura aqui proposta, e que a escala de validação deste trabalho (um único repositório de negativos do mundo real, um número reduzido de sementes por configuração) é insuficiente para generalizar a eficácia do \textit{framework} para categorias de vulnerabilidade além do CWE-416 e do CWE-415, as duas únicas em que uma comparação direta contra um analisador tradicional pôde ser estabelecida (Seção \ref{sec:comparacaotradicional}) e nas quais a hipótese de pesquisa não foi refutada.
+\par
+Como trabalhos futuros, propõe-se: (i) validar as configurações já aprovadas sobre múltiplos repositórios de negativos do mundo real, e não apenas o \textit{git/git}, de forma a confirmar que a taxa de falso positivo observada não é específica daquele projeto; (ii) incorporar, à semelhança de \citeonline{yang2025knighter}, o histórico de \textit{patches} de correção do próprio CWE já na etapa de geração da regra, não apenas como exemplo textual, mas como fonte estruturada de padrões de fonte e sumidouro de contaminação; (iii) investigar arquiteturas alternativas baseadas em agentes com memória e validação sintática concreta, nos moldes de \citeonline{guo2025repoaudit}, como alternativa complementar para os CWEs em que a síntese de uma regra estática generalizável se mostrou mais difícil (CWE-415 e CWE-457); (iv) estender toda e qualquer configuração considerada promissora para, no mínimo, cinco sementes de particionamento antes de reportá-la como resultado, prática adotada apenas na etapa final deste trabalho (Seção \ref{sec:licaometodologica}) e que se mostrou necessária para distinguir um efeito real do ruído amostral do processo de validação cruzada; e (v) obter uma linha de base tradicional para o CWE-401, o CWE-457 e o CWE-476, categorias para as quais o registro gratuito do SemGrep não ofereceu nenhuma regra relevante (Seção \ref{sec:comparacaotradicional}), seja por meio de uma versão paga de um analisador (como o \textit{Semgrep Pro}), de outra ferramenta de análise estática do estado da arte (como o CodeQL), ou de uma regra manualmente especializada escrita por um especialista.
+\endgroup
 
 % ---------------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
