@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 460" font-family="Arial, Helvetica, sans-serif">
+  <rect x="0" y="0" width="900" height="460" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="450" y="24" text-anchor="middle" font-size="17" font-weight="700" fill="#0b0b0b">Comparação: regra tradicional &#215; melhor regra sintetizada</text>
+  <text x="450" y="42" text-anchor="middle" font-size="12" fill="#52514e">Recall, Precisão e F1-Score, por CWE (Tabela — Comparação com um analisador tradicional)</text>
+
+  <!-- Panel titles -->
+  <text x="250" y="92" text-anchor="middle" font-size="14" font-weight="700" fill="#0b0b0b">CWE-416</text>
+  <text x="670" y="92" text-anchor="middle" font-size="14" font-weight="700" fill="#0b0b0b">CWE-415</text>
+
+  <!-- Shared gridlines (both panels, same 0-100 scale) -->
+  <g stroke="#e1e0d9" stroke-width="1">
+    <line x1="45" y1="286" x2="860" y2="286"/>
+    <line x1="45" y1="242" x2="860" y2="242"/>
+    <line x1="45" y1="198" x2="860" y2="198"/>
+    <line x1="45" y1="154" x2="860" y2="154"/>
+    <line x1="45" y1="110" x2="860" y2="110"/>
+  </g>
+  <line x1="45" y1="330" x2="860" y2="330" stroke="#c3c2b7" stroke-width="1.2"/>
+
+  <!-- Shared y-axis labels -->
+  <g font-size="11" fill="#525142" text-anchor="end">
+    <text x="40" y="334">0</text>
+    <text x="40" y="290">20</text>
+    <text x="40" y="246">40</text>
+    <text x="40" y="202">60</text>
+    <text x="40" y="158">80</text>
+    <text x="40" y="114">100</text>
+  </g>
+  <text x="18" y="220" font-size="11" fill="#52514e" transform="rotate(-90 18 220)" text-anchor="middle">% (ou F1&#215;100)</text>
+
+  <!-- Panel separator -->
+  <line x1="460" y1="70" x2="460" y2="330" stroke="#e1e0d9" stroke-width="1"/>
+
+  <!-- ===================== PAINEL CWE-416 ===================== -->
+  <!-- Grupo Recall -->
+  <rect x="82.5"  y="291.72" width="36" height="38.28" fill="#898781"/>
+  <text x="100.5" y="285" text-anchor="middle" font-size="11" font-weight="700" fill="#0b0b0b">17,4%</text>
+  <rect x="126.5" y="110" width="36" height="23.76" fill="#0ca30c"/>
+  <text x="144.5" y="104" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0b0b0b">89,2&#8211;100%</text>
+  <text x="122.5" y="346" text-anchor="middle" font-size="11" fill="#52514e">Recall</text>
+
+  <!-- Grupo Precisão -->
+  <rect x="207.5" y="183.26" width="36" height="146.74" fill="#898781"/>
+  <text x="225.5" y="177" text-anchor="middle" font-size="11" font-weight="700" fill="#0b0b0b">66,7%</text>
+  <rect x="251.5" y="126.72" width="36" height="79.86" fill="#0ca30c"/>
+  <text x="269.5" y="120" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0b0b0b">56,1&#8211;92,4%</text>
+  <text x="247.5" y="346" text-anchor="middle" font-size="11" fill="#52514e">Precisão</text>
+
+  <!-- Grupo F1 -->
+  <rect x="332.5" y="269.28" width="36" height="60.72" fill="#898781"/>
+  <text x="350.5" y="263" text-anchor="middle" font-size="11" font-weight="700" fill="#0b0b0b">0,276</text>
+  <rect x="376.5" y="129.8" width="36" height="41.8" fill="#0ca30c"/>
+  <text x="394.5" y="123" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0b0b0b">0,72&#8211;0,91</text>
+  <text x="372.5" y="346" text-anchor="middle" font-size="11" fill="#52514e">F1-Score</text>
+
+  <!-- ===================== PAINEL CWE-415 ===================== -->
+  <!-- Grupo Recall -->
+  <rect x="502.5" y="266.86" width="36" height="63.14" fill="#898781"/>
+  <text x="520.5" y="260" text-anchor="middle" font-size="11" font-weight="700" fill="#0b0b0b">28,7%</text>
+  <rect x="546.5" y="162.14" width="36" height="72.6" fill="#0ca30c"/>
+  <text x="564.5" y="156" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0b0b0b">43,3&#8211;76,3%</text>
+  <text x="542.5" y="346" text-anchor="middle" font-size="11" fill="#52514e">Recall</text>
+
+  <!-- Grupo Precisão -->
+  <rect x="627.5" y="220" width="36" height="110" fill="#898781"/>
+  <text x="645.5" y="214" text-anchor="middle" font-size="11" font-weight="700" fill="#0b0b0b">50,0%</text>
+  <rect x="671.5" y="198.66" width="36" height="39.82" fill="#0ca30c"/>
+  <text x="689.5" y="192" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0b0b0b">41,6&#8211;59,7%</text>
+  <text x="667.5" y="346" text-anchor="middle" font-size="11" fill="#52514e">Precisão</text>
+
+  <!-- Grupo F1 -->
+  <rect x="752.5" y="249.92" width="36" height="80.08" fill="#898781"/>
+  <text x="770.5" y="243" text-anchor="middle" font-size="11" font-weight="700" fill="#0b0b0b">0,364</text>
+  <rect x="796.5" y="191.4" width="36" height="28.6" fill="#0ca30c"/>
+  <text x="814.5" y="185" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0b0b0b">0,50&#8211;0,63</text>
+  <text x="792.5" y="346" text-anchor="middle" font-size="11" fill="#52514e">F1-Score</text>
+
+  <!-- Legend -->
+  <g font-size="11.5" fill="#52514e">
+    <rect x="260" y="398" width="16" height="16" fill="#898781"/>
+    <text x="282" y="410">Regra tradicional (r/c)</text>
+    <rect x="470" y="398" width="16" height="16" fill="#0ca30c"/>
+    <text x="492" y="410">Melhor regra sintetizada (faixa mín.&#8211;máx. entre 5 sementes)</text>
+  </g>
+
+  <text x="450" y="436" text-anchor="middle" font-size="11" fill="#898781">Nota: o F1-Score é multiplicado por 100 para compartilhar o eixo com Recall/Precisão; não representa um percentual.</text>
+</svg>

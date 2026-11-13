@@ -218,19 +218,20 @@ Smaller-scale language models proved technically viable for running the complete
 \textbf{Abreviatura} & \textbf{Significado} \\
 \midrule
 AST  & \textit{Abstract Syntax Tree} (Árvore de Sintaxe Abstrata) \\
-APR  & \textit{Application Programming Interface} (Reparo de Programa Automatizado) \\
+APR  & \textit{Automated Program Repair} (Reparo de Programa Automatizado) \\
 BNF  & \textit{Backus-Naur Form} (Forma de Backus-Naur) \\
-CFG  & \textit{Control Flow Graphs} (Grafos de Fluxo de Controle) \\
+CFG  & \textit{Control Flow Graphs} (Grafos de Fluxo de Controle); também usado, em outro sentido, para \textit{Context-Free Grammar} (Gramática Livre de Contexto, Seção \ref{subsec:linguagemnatural}) \\
 CNN  & \textit{Convolucional Neural Networks} (Redes Neurais Convolucionais) \\
 CSA  & \textit{Clang Static Analyser} \\
 CVE  & \textit{Common Vulnerabilities and Exposures} (Enumeração Comum de Vulnerabilidades e Exposições)  \\
 CWE  & \textit{Common Weakness Enumeration} (Enumeração de Fraquezas Comuns) \\
 DFA  & \textit{Data Flow Analysis} (Análise de Fluxo de Dados) \\
 DoS  & \textit{Denial of Service} (Negação de Serviço) \\
-DSR  & \textit{Design Science Research} \\ 
+DSR  & \textit{Design Science Research} \\
 FIA  & \textit{Flow-Insensitive Analysis} (Análise Insensível ao Fluxo) \\
 FN   & \textit{False Negative} (Falsos Negativos) \\
 FP   & \textit{False Positive} (Falsos Positivos) \\
+IA   & Inteligência Artificial \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -241,7 +242,7 @@ FP   & \textit{False Positive} (Falsos Positivos) \\
 \textbf{Abreviatura} & \textbf{Significado} \\
 \midrule
 FSA  & \textit{Flow-Sensitive Analysis} (Análise Sensível ao Fluxo) \\
-CFG  & \textit{Context-Free Grammar} (Gramática Livre de Contexto) \\
+KLOC & \textit{Thousand Lines of Code} (Mil Linhas de Código) \\
 LLM  & \textit{Large Language Models} (Modelos de Larga Escala) \\
 NLG  & \textit{Natural Language Generation} (Geração de Linguagem Natural) \\
 NLP  & \textit{Natural Language Processing} (Processamento de Linguagem Natural) \\
@@ -529,8 +530,7 @@ O desenvolvimento de um \textit{framework} iterativo, focado na geração automa
 \par
 O primeiro é a dependência de engenharia manual: escrever regras de detecção exige conhecimento especializado, a ponto de menos de 5\% das lógicas de detecção utilizadas na indústria serem criadas por usuários comuns \cite{hou2025generation}.
 \par
-\antigo{O segundo é o custo da inferência direta por IAs: submeter projetos inteiros a um LLM pode consumir dezenas de milhões de \textit{tokens} e dias de processamento por projeto (Li et al., 2026), o que inviabiliza o seu uso contínuo.}
-\novo{O segundo é o custo da inferência direta por IAs: submeter projetos inteiros a um LLM pode consumir dezenas de milhões de \textit{tokens} e exigir dias de processamento contínuo, o mesmo limite de escalabilidade já discutido na Seção \ref{sec:contexto} \cite{hou2025generation}, o que inviabiliza o seu uso contínuo.}
+O segundo é o custo da inferência direta por IAs: submeter projetos inteiros a um LLM pode consumir dezenas de milhões de \textit{tokens} e exigir dias de processamento contínuo, o mesmo limite de escalabilidade já discutido na Seção \ref{sec:contexto} \cite{hou2025generation}, o que inviabiliza o seu uso contínuo.
 Gerar as regras uma única vez e reutilizá-las no SemGrep, cuja execução não depende de LLMs, ataca os dois problemas simultaneamente.
 \par
 Ao propor um sistema especializado nas vulnerabilidades críticas (CWEs) da linguagem C, essa pesquisa visa demonstrar que é possível identificar padrões semânticos e \textit{corner-cases} com maior precisão e viabilidade técnica do que os analisadores estáticos tradicionais ou métodos generalistas baseados exclusivamente em LLMs.

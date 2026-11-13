@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 380" font-family="Arial, Helvetica, sans-serif">
+  <rect x="0" y="0" width="850" height="380" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="425" y="26" text-anchor="middle" font-size="17" font-weight="700" fill="#0b0b0b">Falsos positivos por configuração — evolução da regra do CWE-416</text>
+  <text x="425" y="45" text-anchor="middle" font-size="12" fill="#52514e">Faixa mínimo–máximo no conjunto de teste (combo D, formato &#8220;template&#8221;)</text>
+
+  <!-- Vertical gridlines (log scale: 10, 20, 50, 100, 200, 500, 1.000) -->
+  <g stroke="#e1e0d9" stroke-width="1">
+    <line x1="312.8" y1="65" x2="312.8" y2="325"/>
+    <line x1="422.2" y1="65" x2="422.2" y2="325"/>
+    <line x1="587.8" y1="65" x2="587.8" y2="325"/>
+    <line x1="697.2" y1="65" x2="697.2" y2="325"/>
+  </g>
+  <g stroke="#c3c2b7" stroke-width="1.2">
+    <line x1="230" y1="65" x2="230" y2="325"/>
+    <line x1="505" y1="65" x2="505" y2="325"/>
+    <line x1="780" y1="65" x2="780" y2="325"/>
+  </g>
+
+  <!-- Axis baseline -->
+  <line x1="230" y1="325" x2="780" y2="325" stroke="#c3c2b7" stroke-width="1.2"/>
+
+  <!-- Tick marks -->
+  <g stroke="#898781" stroke-width="1">
+    <line x1="230" y1="325" x2="230" y2="331"/>
+    <line x1="312.8" y1="325" x2="312.8" y2="331"/>
+    <line x1="422.2" y1="325" x2="422.2" y2="331"/>
+    <line x1="505" y1="325" x2="505" y2="331"/>
+    <line x1="587.8" y1="325" x2="587.8" y2="331"/>
+    <line x1="697.2" y1="325" x2="697.2" y2="331"/>
+    <line x1="780" y1="325" x2="780" y2="331"/>
+  </g>
+
+  <!-- Tick labels -->
+  <g font-size="11" fill="#52514e" text-anchor="middle">
+    <text x="230" y="344">10</text>
+    <text x="312.8" y="344">20</text>
+    <text x="422.2" y="344">50</text>
+    <text x="505" y="344">100</text>
+    <text x="587.8" y="344">200</text>
+    <text x="697.2" y="344">500</text>
+    <text x="780" y="344">1.000</text>
+  </g>
+
+  <text x="505" y="364" text-anchor="middle" font-size="12" fill="#52514e">Falsos positivos no conjunto de teste (escala logarítmica)</text>
+
+  <!-- Row 1: pairs -->
+  <rect x="484.2" y="88" width="159.7" height="40" rx="2" fill="#2a78d6"/>
+  <text x="220" y="103" text-anchor="end" font-family="Courier New, monospace" font-size="11" fill="#0b0b0b">pairs</text>
+  <text x="220" y="118" text-anchor="end" font-size="10" fill="#898781">1 de 5 sementes aprovadas</text>
+  <text x="651.9" y="112" font-size="12" font-weight="700" fill="#0b0b0b">84&#8211;320</text>
+
+  <!-- Row 2: pairs + guard + project_apis -->
+  <rect x="722.7" y="175" width="30.5" height="40" rx="2" fill="#d03b3b"/>
+  <text x="220" y="190" text-anchor="end" font-family="Courier New, monospace" font-size="11" fill="#0b0b0b">pairs + guard + project_apis</text>
+  <text x="220" y="205" text-anchor="end" font-size="10" fill="#898781">0 de 2 sementes aprovadas</text>
+  <text x="761.2" y="199" font-size="12" font-weight="700" fill="#0b0b0b">619&#8211;799</text>
+
+  <!-- Row 3: pairs + guard (final) -->
+  <rect x="251.8" y="262" width="345.2" height="40" rx="2" fill="#0ca30c"/>
+  <text x="220" y="277" text-anchor="end" font-family="Courier New, monospace" font-size="11" fill="#0b0b0b">pairs + guard</text>
+  <text x="220" y="289" text-anchor="end" font-size="9" font-style="italic" fill="#898781">(configuração final)</text>
+  <text x="220" y="301" text-anchor="end" font-size="10" font-weight="700" fill="#0b6b0b">2 de 5 sementes aprovadas ✓</text>
+  <text x="605.0" y="286" font-size="12" font-weight="700" fill="#0b0b0b">12&#8211;216</text>
+</svg>
