@@ -32,6 +32,8 @@
 \usepackage{multirow}               % Células mescladas em tabelas
 \usepackage{longtable}              % Tabelas longas
 \usepackage{amsmath,amssymb}        % Símbolos matemáticos
+\usepackage{tikz}                   % Diagramas vetoriais
+\usetikzlibrary{positioning}
 \usepackage{pgfgantt}               % Diagramas de Gantt
 \usepackage[brazilian,hyperpageref]{backref}  % Páginas com citações
 \usepackage[alf]{abntex2cite}       % Citações ABNT
@@ -1473,13 +1475,39 @@ Essa decisão visa viabilizar a execução do \textit{framework} em infraestrutu
 \label{sec:arquiteturaimplementada}
 \par
 Durante a implementação, a arquitetura de quatro agentes descrita nesta seção foi consolidada em um ciclo mais enxuto, definido empiricamente ao longo dos experimentos.
-Em vez de quatro agentes LLM distintos operando em sequência fixa, o sistema implementado estrutura-se em dois papéis centrais executados por modelos de linguagem -- \textbf{gerador} e \textbf{corretor} -- e um componente determinístico, o \textbf{\textit{gate} de avaliação}, responsável por validar sintaticamente, executar e avaliar quantitativamente cada regra candidata.
+Em vez de quatro agentes LLM distintos operando em sequência fixa, o sistema implementado estrutura-se em dois papéis centrais executados por modelos de linguagem -- \textbf{gerador} e \textbf{corretor} -- e um componente determinístico, o \textbf{\textit{gate} de avaliação}, responsável por validar sintaticamente, executar e avaliar quantitativamente cada regra candidata, conforme ilustrado na Figura \ref{fig:arquiteturaimplementada}.
+
+\begin{figure}[htb]
+    \centering
+    \caption{Arquitetura efetivamente implementada: ciclo gerador--\textit{gate}--corretor}
+    \begin{tikzpicture}[
+        node distance=1.1cm and 2.0cm,
+        every node/.style={font=\small},
+        box/.style={draw, rounded corners, fill=black!5, align=center, minimum height=1.2cm, minimum width=2.6cm}
+      ]
+      \node[box] (ger) {Gerador\\(LLM)};
+      \node[box, right=of ger] (gate) {\textit{Gate}\\determinístico};
+      \node[box, right=of gate] (final) {Conjunto final\\de regras};
+      \node[box, below=1.6cm of gate] (cor) {Corretor\\(LLM)};
+
+      \draw[->, thick] (ger) -- node[above,font=\scriptsize]{regra candidata} (gate);
+      \draw[->, thick] (gate) -- node[above,font=\scriptsize]{aprovada} (final);
+      \draw[->, thick] (gate.south) -- node[right,font=\scriptsize]{reprovada} (cor.north);
+      \draw[->, thick] (cor.west) .. controls +(-1.0,0.3) and +(-1.0,-0.3) .. node[left,font=\scriptsize,align=right]{nova\\versão} (gate.west);
+    \end{tikzpicture}
+    \legend{Fonte: Elaborado pelo autor (2026)}
+    \label{fig:arquiteturaimplementada}
+\end{figure}
+
 \par
 O papel de \textbf{gerador} corresponde, em essência, à fusão dos antigos Agentes \#1 e \#2 (análise/abstração e síntese de sintaxe): a partir dos exemplos de código vulnerável e seguro de um CWE, o gerador escreve diretamente a regra candidata, no formato de saída configurado (Seção \ref{sec:formatosregras}).
 \par
 O \textit{gate}, por sua vez, substitui a função de validação originalmente atribuída ao Agente \#3, porém de forma inteiramente determinística: um módulo em \textit{Python} normaliza a resposta do modelo, verifica a validade estrutural da regra (posicionamento correto dos operadores do SemGrep, presença de ao menos um matizador de alto nível, terminação de instruções em C), aplica uma checagem lexical (\textit{lint}) que rejeita regras que reutilizem identificadores específicos dos exemplos de treinamento em vez de metavariáveis, executa o motor do SemGrep sobre os arquivos de treinamento e computa \textit{recall}, precisão e taxa de falsos positivos.
 \par
 O papel de \textbf{corretor} herda a função reativa do antigo Agente \#3: recebe a regra candidata e o relatório de erros ou métricas do \textit{gate} e produz uma nova versão da regra, em um ciclo iterativo limitado a um número configurável de tentativas (até seis, em vez das três originalmente previstas, valor que se mostrou necessário para regras mais complexas).
+\par
+O teto de seis tentativas é um ajuste empírico, não o resultado de uma comparação dedicada entre diferentes valores de teto: as primeiras execuções mostraram o corretor repetindo a mesma regra reprovada já na terceira ou quarta tentativa, sem conseguir progredir dentro do orçamento original de três, o que motivou dobrá-lo para seis.
+Mesmo dentro desse novo orçamento, o mesmo comportamento de repetição persistiu em boa parte das execuções registradas -- em algumas configurações, o corretor reenviou a regra da tentativa anterior em até cinco das seis correções disponíveis --, limitação que viria a motivar diretamente o mecanismo \texttt{field\_correct} (Seção \ref{sec:formatosregras}).
 \par
 Uma regra é considerada \textbf{aprovada} quando, no conjunto de treinamento, atinge \textit{recall} mínimo de 50\%, não produz nenhum falso positivo nos casos sintéticos do Juliet Test Suite e não ultrapassa 0,1 alertas por mil linhas de código (KLOC) ao ser executada sobre uma base de código real assumida como correta (Seção \ref{sec:protocoloavaliacao}).
 Caso o orçamento de tentativas se esgote sem aprovação, a melhor tentativa observada é mantida apenas para fins de avaliação no conjunto de teste, não sendo incorporada ao conjunto final de regras.
@@ -1528,6 +1556,10 @@ Esse resultado é relevante por si: demonstra que o objetivo central deste traba
 \par
 Para viabilizar a execução do \textit{framework} em \textit{hardware} local e investigar o Objetivo Específico 3 (Seção \ref{sec:objespecifico}), diversas combinações de modelos de linguagem foram configuradas e avaliadas ao longo do trabalho, detalhadas na Tabela \ref{tab:combosmodelos}.
 Todas as combinações utilizam o mesmo modelo de 3 bilhões de parâmetros (Qwen2.5-Coder-3B) na etapa de detecção inicial de vulnerabilidades, variando o modelo responsável pela geração e correção das regras.
+\par
+Essa fixação atende a dois propósitos: isola o porte do modelo gerador/corretor como a variável experimental de interesse, evitando que uma mudança simultânea no detector confundisse o efeito observado entre as combinações; e mantém barata a etapa que mais se repete ao longo da execução, já que o detector varre cada arquivo do projeto-alvo em busca de candidatos, enquanto o gerador e o corretor atuam apenas sobre os poucos candidatos identificados. 
+\par
+Apontar textualmente onde um defeito pode estar é uma tarefa estruturalmente mais tolerante a erro do que produzir uma regra sintaticamente válida, de modo que um modelo pequeno já é suficiente para a primeira, sem comprometer a qualidade da segunda.
 
 \begin{table}[htb]
     \centering
