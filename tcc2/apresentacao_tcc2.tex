@@ -184,7 +184,8 @@
 %   - Problema e motivação .......... ~3 min   (2 slides)
 %   - Ferramentas utilizadas ......... ~2,5 min (3 slides: SemGrep, exemplo
 %                                                 de regra, Juliet)
-%   - Objetivos e método ............ ~2,5 min (2 slides)
+%   - Objetivos e método ............ ~2,5 min (3 slides: objetivos, arquitetura
+%                                                 em tópicos, arquitetura em diagrama)
 %   - Resultados ..................... ~11,5 min (12 slides, incl. 7 slides
 %                                                 de vocabulário: formato+
 %                                                 combo, nossas combinações,
@@ -208,22 +209,21 @@
 \begin{frame}{O problema}
   \begin{itemize}
     \item Uma falta de checagem de tamanho no OpenSSL causou o \textit{Heartbleed} (CVE-2014-0160).
-    \item Entre 24\% e 55\% dos servidores HTTPS mais acessados do mundo ficaram vulneráveis, como: Yahoo, Stack Overflow e a Receita Federal do Canadá.
-    \item Análise estática tradicional depende de regras rígidas e manuais -- menos de 5\% das lógicas de detecção usadas na indústria são escritas por usuários comuns.
-    \item Submeter o código inteiro a um LLM: dezenas de milhões de \textit{tokens}, dias de processamento e risco de alucinação.
+    \item Acesso a senhas, dados pessoais e chaves criptográficas.
+    \item Entre 24\% e 55\% dos servidores HTTPS mais acessados do mundo ficaram vulneráveis.
+    \begin{itemize} 
+      \item Como: Yahoo, Stack Overflow e a Receita Federal do Canadá.
+    \end{itemize}
+    \item 70\% de vulnerabilidades críticas da Microsoft e Chromium.
+    \begin{itemize}
+      \item Erros de segurança de memória. 
+    \end{itemize}
+    \item Análise estática tradicional depende de regras rígidas e manuais.
+    \item Submeter o código inteiro a um LLM: 
+    \begin{itemize}
+      \item Dezenas de milhões de \textit{tokens}, dias de processamento e risco de alucinação.
+    \end{itemize}
   \end{itemize}
-\end{frame}
-
-\begin{frame}{Pergunta de pesquisa}
-  \begin{quote}
-    \itshape Um \textit{framework} multi-agente baseado em LLMs é capaz de sintetizar regras para o SemGrep que detectem vulnerabilidades em código C com \textit{recall} e precisão estatisticamente superiores aos do \textit{ruleset} tradicional da ferramenta?
-  \end{quote}
-  \vspace{0.3cm}
-  \textbf{Escopo:} linguagem C, SemGrep como motor de execução, cinco CWEs de memória:
-  \begin{center}
-  \small CWE-401 (vazamento) \quad CWE-415 (liberação dupla) \quad CWE-416 (uso após liberação)\\
-  CWE-457 (variável não inicializada) \quad CWE-476 (ponteiro nulo)
-  \end{center}
 \end{frame}
 
 % ---------------------------------------------------------------
@@ -232,12 +232,27 @@
 \begin{frame}{Ferramenta: SemGrep}
   \footnotesize
   \begin{itemize}
-    \item Analisador estático de código aberto: regras em YAML, com padrões que imitam a própria sintaxe da linguagem analisada -- ao contrário do CodeQL, que trata o código como um banco de dados relacional.
-    \item Converte o código em uma árvore de sintaxe abstrata universal (UAST), com \textit{pattern-matching} uniforme em mais de 30 linguagens.
-    \item \textbf{Metavariáveis} (\texttt{\$VAR}) capturam um valor e exigem reuso idêntico, permitindo fluxo de dados; \textbf{reticências} (\texttt{...}) abstraem qualquer trecho irrelevante do padrão.
-    \item Modo \textit{taint}: declara fonte, sumidouro (\textit{sink}) e, opcionalmente, desinfetantes (\textit{sanitizers}) de contaminação -- o modo usado neste trabalho.
-    \item Mantém um \textit{ruleset} público/comunitário -- é esse conjunto que este trabalho chama de ``regra tradicional''.
+    \item Analisador estático de código aberto.
+    \begin{itemize}
+      \footnotesize
+      \item Regras em YAML; padrões que imitam sintaxe;
+      \item Contrário do CodeQL, tratando como banco de dados;
+    \end{itemize}
+    \item Converte o código em uma árvore de sintaxe abstrata universal (UAST)
+    \item Com \textit{pattern-matching} uniforme em mais de 30 linguagens.
+    \item \textbf{Metavariáveis} (\texttt{\$VAR}) capturam um valor e exigem reuso idêntico;
+    \item \textbf{Reticências} (\texttt{...}) abstraem qualquer trecho irrelevante do padrão.
+    \item Modo \textit{taint}: declara área no código(\textit{sink}) e se rastreia o fluxo de dados.
+    \begin{itemize}
+      \footnotesize
+      \item Ao contrário de padrões estáticos.
+    \end{itemize}
+    \item Possuem \textit{ruleset} público/comunitário -- é esse conjunto que este trabalho chama de ``regra tradicional''.
+    \item Apenas a \textbf{CWE-416} e \textbf{CWE-415} têm regra tradicional direta no pacote \texttt{r/c}.
   \end{itemize}
+  \vspace{-0.2cm}
+  \vfill
+  {\tiny\itshape CWE-416: uso após liberação (\textit{use-after-free}); CWE-415: liberação dupla (\textit{double-free}).\par}
 \end{frame}
 
 \begin{frame}{Exemplo de regra SemGrep}
@@ -253,11 +268,30 @@
 
 \begin{frame}{Ferramenta: Juliet Test Suite}
   \begin{itemize}
-    \item Coleção de domínio público do NIST (SARD): dezenas de milhares de casos de teste sintéticos em C/C++ e Java, cada um exemplificando uma vulnerabilidade categorizada por CWE.
-    \item Cada caso de teste existe em par: uma variante vulnerável e uma variante corrigida do mesmo código.
-    \item Papel neste trabalho: (1) fonte de treino/teste da validação cruzada ($k=5$); (2) piso de qualidade do \textit{gate} -- zero falsos positivos exigidos sobre o Juliet.
-    \item Também alimenta o modo de exemplos \texttt{pairs} do gerador: os pares vulnerável/seguro do próprio Juliet, mostrados como exemplo ao LLM.
+    \item Coleção de domínio público do NIST (SARD):
+    \begin{itemize}
+      \item Possui milhares de casos de teste sintéticos em C/C++ e Java, categorizada por CWE.
+    \end{itemize} 
+    \item Cada caso possui uma variante vulnerável e uma variante corrigida do mesmo código.
+    \item Papel neste trabalho: 
+    \begin{itemize}
+      \item (1) fonte de treino/teste da validação cruzada; 
+      \item (2) piso de qualidade do \textit{gate}, zero falsos positivos exigidos sobre o \textit{dataset}.
+    \end{itemize}
+    \item Alimenta o modo de exemplos \texttt{pairs} do gerador: mostrados como exemplo ao LLM.
   \end{itemize}
+\end{frame}
+
+\begin{frame}{Pergunta de pesquisa}
+  \begin{quote}
+    \itshape Um \textit{framework} multi-agente baseado em LLMs é capaz de sintetizar regras para o SemGrep que detectem vulnerabilidades em código C com \textit{recall} e precisão estatisticamente superiores aos do \textit{ruleset} tradicional da ferramenta?
+  \end{quote}
+  \vspace{0.3cm}
+  \textbf{Escopo:} linguagem C, SemGrep como motor de execução, cinco CWEs de memória:
+  \begin{center}
+  \small CWE-401 (vazamento) \quad CWE-415 (liberação dupla) \quad CWE-416 (uso após liberação)\\
+  CWE-457 (variável não inicializada) \quad CWE-476 (ponteiro nulo)
+  \end{center}
 \end{frame}
 
 % ---------------------------------------------------------------
@@ -279,8 +313,27 @@
 \end{frame}
 
 \begin{frame}{Arquitetura implementada}
+  \begin{itemize}
+    \item Arquitetura simplificada.
+    \item Gerador e Corretor, com Gate determinístico.
+    \item \textbf{\textit{Gate}}: valida a sintaxe, executa o SemGrep e mede \textit{recall}, precisão e falsos positivos.
+    \item \textbf{Aprovação}: \textit{recall} $\geq$ 50\%, zero falsos positivos no Juliet, $\leq$ 0,1 alertas por KLOC em código real, assumido correto (git).
+    \begin{itemize}
+      \item Até 6 tentativas de correção, teto empírico (começou em 3).
+    \end{itemize}
+    \item A repetição persistiu (5 de 6), o que motivou o \texttt{field\_correct} (corrige só o campo errado).
+    \item Validação cruzada ($k=5$), até 5 sementes por configuração.
+    \begin{itemize}
+      \item Número que define o sorteio do Juliet Test Suite para a validação.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Arquitetura implementada: fluxo}
   \begin{center}
+  \vfill
   \begin{tikzpicture}[
+      scale=1.3, transform shape,
       node distance=0.9cm and 1.5cm,
       every node/.style={font=\small},
       box/.style={draw, rounded corners, fill=senacblue!10, align=center, minimum height=1.1cm, minimum width=2.4cm}
@@ -295,15 +348,8 @@
     \draw[->, thick] (gate.south) -- node[right,font=\scriptsize]{reprovada} (cor.north);
     \draw[->, thick] (cor.west) .. controls +(-0.8,0.25) and +(-0.8,-0.25) .. node[left,font=\scriptsize,align=right]{nova\\versão} (gate.west);
   \end{tikzpicture}
+  \vfill
   \end{center}
-  \vspace{-0.3cm}
-  \begin{itemize}
-    \footnotesize
-    \item \textbf{\textit{Gate}}: valida a sintaxe, executa o SemGrep e mede \textit{recall}, precisão e falsos positivos.
-    \item \textbf{Aprovação}: \textit{recall} $\geq$ 50\%, zero falsos positivos no Juliet, $\leq$ 0,1 alertas por KLOC em código real.
-    \item Até 6 tentativas de correção -- teto empírico (começou em 3); a repetição persistiu mesmo assim, o que motivou o \texttt{field\_correct} (corrige só o campo errado, não a regra inteira).
-    \item Validação cruzada ($k=5$), até 5 sementes por configuração.
-  \end{itemize}
 \end{frame}
 
 % ---------------------------------------------------------------
@@ -311,7 +357,7 @@
 % ---------------------------------------------------------------
 \begin{frame}{Antes dos números: formato e combinação de modelo}
   \begin{itemize}
-    \item \textbf{Formato de saída} (liberdade decrescente do modelo gerador): \texttt{yaml} $>$ \texttt{spec} $>$ \texttt{template} $>$ \texttt{form} $>$ \texttt{formsearch}.
+    \item \textbf{Formato de saída} (liberdade do modelo gerador): \texttt{yaml} $>$ \texttt{spec} $>$ \texttt{template} $>$ \texttt{form} $>$ \texttt{formsearch}.
     \item \textbf{Combinação de modelo} (\textit{combo}): define o(s) LLM(s) usados como gerador/corretor -- Combo D usa um modelo de 30B (\textit{Mixture-of-Experts}); Combo C, um modelo de 4B.
   \end{itemize}
   \vspace{0.2cm}
@@ -336,24 +382,36 @@
   \vspace{-0.1cm}
   \begin{itemize}
     \item Todas usam o mesmo modelo de detecção inicial (Qwen2.5-Coder-3B); variam só o gerador/corretor.
-    \item Combo D foi necessária para os melhores resultados; Combo C (4B) não reproduziu os ganhos do \texttt{field\_correct}.
+    \item Mantém custo baixo para a análise completa do projeto.
+    \item Determinando áreas de possíveis \textit{bugs}.
+    \item Combo D é do tipo \textit{Mixture-of-Experts}.
+    \begin{itemize}
+      \item Entra uma fração pequena desses parâmetros entra em ação a cada token, cerca de 3 milhões.
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Modo de exemplos: \texttt{findings} (padrão)}
   \begin{itemize}
-    \item O \textbf{modo de exemplos} (\texttt{example\_mode}) define o que é mostrado ao gerador antes de escrever a regra -- há quatro valores: \texttt{findings}, \texttt{pairs}, \texttt{graph} e \texttt{none}.
-    \item Em \texttt{findings}, o gerador recebe o relatório textual de um \textbf{detector inicial}: um LLM menor (3B) que descreve, em linguagem natural, onde acredita haver o defeito.
+    \item O \textbf{modo de exemplos} (\texttt{example\_mode}) define o que é mostrado ao gerador antes de escrever a regra;
+    \begin{itemize}
+      \item Tendo quatro valores: \texttt{findings}, \texttt{pairs}, \texttt{graph} e \texttt{none}.
+    \end{itemize}
+    \item Em \texttt{findings}, o gerador recebe o relatório textual de um \textbf{detector inicial}, em linguagem natural, onde acredita haver o defeito.
     \item Foi o modo padrão, usado nas primeiras rodadas experimentais, antes de qualquer alternativa ser testada.
-    \item Limitação observada: a descrição é predominantemente textual -- não aponta as linhas exatas do código envolvidas no defeito.
+    \item Limitação observada: a descrição é apenas textual, não apontando as linhas exatas do código envolvidas no defeito.
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Modo de exemplos: \texttt{pairs}}
   \begin{itemize}
-    \item O gerador recebe, lado a lado, o par de código do próprio Juliet Test Suite: a versão \textbf{vulnerável} e a versão \textbf{corrigida} do mesmo trecho.
+    \item O gerador recebe, lado a lado, o par de código do próprio Juliet Test Suite.
     \item É o parâmetro da \textbf{única configuração efetivamente aprovada pelo \textit{gate}} ao longo de todo o trabalho (Combo D, \texttt{template}, CWE-416).
-    \item Vantagem sobre \texttt{findings}: mostra ao modelo não só onde está o defeito, mas também o que o diferencia do código seguro equivalente.
+    \item Vantagem sobre \texttt{findings}:
+    \begin{itemize}
+      \item Mostra ao modelo não só onde está o defeito;
+      \item Mas também o que o diferencia do código seguro equivalente.
+    \end{itemize}
   \end{itemize}
   \vfill
   {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}).\par}
@@ -361,14 +419,21 @@
 
 \begin{frame}{Modo de exemplos: \texttt{graph}}
   \begin{itemize}
-    \item Alimentado por um componente à parte, sem LLM: o analisador de grafos de eventos de memória, que aponta as duas linhas exatas do defeito (liberação e uso).
-    \item Efeito medido no CWE-416 (Combo D): \textit{recall} sobe, mas a regra fica mais ruidosa -- mais abrangente, não mais silenciosa.
+    \item Componente à parte, sem LLM: 
+    \begin{itemize}
+      \item Analisador de grafos de eventos de memória, que aponta as duas linhas exatas do defeito (liberação e uso).
+    \end{itemize}
+    \item Efeito medido no CWE-416 (Combo D): 
+    \begin{itemize}
+      \item \textit{recall} sobe, mas a regra fica mais ruidosa, mais abrangente.
+      \item Limite da linguagem YAML.
+    \end{itemize}
   \end{itemize}
   \begin{table}
   \small
   \begin{tabular}{lcc}
   \toprule
-  \textbf{Métrica} & \textbf{Achados do detector} & \textbf{Achados do grafo} \\
+  \textbf{Métrica} & \textbf{Achados do \textit{findings}} & \textbf{Achados do grafo} \\
   \midrule
   \textit{Recall} & 71,6\% & 91,6\% \\
   Precisão & 89,4\% & 69,8\% \\
@@ -377,16 +442,16 @@
   \bottomrule
   \end{tabular}
   \end{table}
-  \footnotesize Causa: o achado do grafo diz \textit{onde} está o defeito, mas não instrui o modelo a excluir a própria linha de liberação do padrão de uso perigoso.
+  \footnotesize Causa: o achado do grafo diz \textit{onde} está o defeito, mas não consegue acompanhar o fluxo de dados devidamente.
   \vfill
   {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}).\par}
 \end{frame}
 
 \begin{frame}{Mecanismos do corretor: \texttt{guard} e \texttt{project\_apis}}
   \begin{itemize}
-    \item \textbf{\texttt{guard}}: nunca permite que uma correção substitua a melhor regra já encontrada por uma pior -- protege contra regressões durante a correção.
-    \item \textbf{\texttt{project\_apis}}: insere no \textit{prompt} os nomes das funções de memória do próprio projeto-alvo.
-    \item Juntos, elevaram o \textit{recall} do CWE-416 -- mas à custa de um salto de ruído; isolar o \texttt{project\_apis} revelou que ele era a fonte do problema (próximo slide).
+    \item \textbf{\texttt{guard}}: nunca permite que uma correção substitua a melhor regra já encontrada por uma pior.
+    \item \textbf{\texttt{project\_apis}}: insere no \textit{prompt} os nomes das funções de memória utilizadas no projeto-alvo.
+    \item Juntas elevaram o \textit{recall} do CWE-416, mas à custa de um salto de ruído.
   \end{itemize}
   \vspace{0.15cm}
   \textit{\footnotesize Leitura: ``\texttt{pairs+guard}'' = modo de exemplos \texttt{pairs} com o mecanismo \texttt{guard} ativo.}
@@ -394,10 +459,23 @@
   {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}).\par}
 \end{frame}
 
+\begin{frame}{Síntese dos resultados por CWE: leitura}
+  \begin{itemize}
+    \item Apenas o CWE-416 obteve aprovação consistente do \textit{gate} (2 de 5 sementes).
+    \item O CWE-415 chegou perto.
+    \item \textit{Recall} é a média das 5 dobras por semente.
+    \item A dobra do CWE-416 que passou no \textit{gate} teve 57\%, não o topo da faixa.
+    \item Aprovação exige também $\leq$ 0,1 alertas/KLOC no git/git.
+    \item Fluxo de dados sendo complexo para YAML capturar.
+  \end{itemize}
+  \vfill
+  {\tiny\itshape CWE-416: Uso Após Liberação -- CWE-415: Liberação Dupla.\par}
+\end{frame}
+
 \begin{frame}{Síntese dos resultados por CWE}
   \begin{table}
-  \small
-  \begin{tabular}{lp{4.4cm}cc}
+  \normalsize
+  \begin{tabular}{lp{5.2cm}cc}
   \toprule
   \textbf{CWE} & \textbf{Melhor configuração} & \textbf{\textit{Recall}} & \textbf{Aprovação} \\
   \midrule
@@ -409,12 +487,7 @@
   \bottomrule
   \end{tabular}
   \end{table}
-  \footnotesize
-  \begin{itemize}
-    \item Apenas o CWE-416 obteve aprovação consistente do \textit{gate}; o CWE-415 chegou perto, sem jamais ser aprovado.
-    \item \textit{Recall} vem do teste isolado do Juliet; aprovação exige também $\leq$ 0,1 alertas/KLOC no git/git (só filtra ruído).
-  \end{itemize}
-  \vspace{-0.25cm}
+  \vfill
   {\tiny\itshape CWE-416: Uso Após Liberação -- CWE-415: Liberação Dupla -- CWE-401: Vazamento -- CWE-476: Ponteiro Nulo -- CWE-457: Var. Não Inicializada.\par}
 \end{frame}
 
@@ -433,11 +506,13 @@
   \end{table}
   \begin{itemize}
     \footnotesize
-    \item *Linha do meio: rodada de diagnóstico isolado, só 2 sementes -- as demais usam 5.
-    \item \texttt{project\_apis} (nomes de função do próprio projeto) foi a fonte do ruído -- removê-lo, mantendo apenas \texttt{guard}, deu o melhor resultado do trabalho.
+    \item \texttt{pairs} ainda tinha de 84 a 320 falsos positivos.
+    \item \texttt{project\_apis} foi a fonte do ruído.
+    \item Mantendo apenas \texttt{guard}, deu o melhor resultado do trabalho.
+    \item A dobra efetivamente aprovada teve 57\% de \textit{recall} e 0,03--0,04 alertas/KLOC.
+    \item As dobras de \textit{recall} mais alto foram as que geraram ruído e reprovaram.
   \end{itemize}
   \vspace{0.2cm}
-  {\footnotesize\itshape [Espaço reservado para gráfico -- Images/grafico-fp-cwe416.svg]\par}
   \vfill
   {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}).\par}
 \end{frame}
@@ -454,53 +529,50 @@
   \end{tabular}
   \end{center}
   \begin{itemize}
-    \item Amplitude de 33 pontos percentuais entre sementes -- maior do que o efeito de qualquer mecanismo testado.
+    \item Variação instável.
+    \item Nas primeiras interações gerou 63,8\% e 64,8\%.
     \item Nunca aprovada pelo \textit{gate}: \textit{recall} $\geq$ 50\% \textbf{e} ruído real $\leq$ 0,1 alertas/KLOC, simultaneamente, nunca aconteceram juntos.
-    \item Lição metodológica: avaliar sempre com múltiplas sementes antes de reportar um resultado.
   \end{itemize}
   \vspace{0.1cm}
-  {\footnotesize\itshape [Espaço reservado para gráfico -- Images/grafico-recall-cwe415.svg]\par}
   \vfill
   {\tiny\itshape CWE-415: Liberação Dupla (\textit{Double Free}).\par}
 \end{frame}
 
-\begin{frame}{A regra sintetizada supera a regra tradicional}
+\begin{frame}{CWE-416: a regra sintetizada supera a tradicional}
   \begin{table}
   \small
-  \begin{tabular}{llccc}
+  \begin{tabular}{lccc}
   \toprule
-  \textbf{CWE} & \textbf{Abordagem} & \textbf{\textit{Recall}} & \textbf{Precisão} & \textbf{F1} \\
+  \textbf{Abordagem} & \textbf{\textit{Recall}} & \textbf{Precisão} & \textbf{F1} \\
   \midrule
-  \multirow{2}{*}{416} & Tradicional (\texttt{r/c}) & 17,4\% & 66,7\% & 0,276 \\
-   & Sintetizada & 89,2--100\% & 56,1--92,4\% & 0,72--0,91 \\
-  \midrule
-  \multirow{2}{*}{415} & Tradicional (\texttt{r/c}) & 28,7\% & 50,0\% & 0,364 \\
-   & Sintetizada & 43,3--76,3\% & 41,6--59,7\% & 0,50--0,63 \\
+  Tradicional (\texttt{r/c}) & 17,4\% & 66,7\% & 0,276 \\
+  Sintetizada & 89,2--100\% & 56,1--92,4\% & 0,72--0,91 \\
   \bottomrule
   \end{tabular}
   \end{table}
   \begin{itemize}
     \footnotesize
-    \item \texttt{r/c}: pacote do registro público do SemGrep -- a ``regra tradicional'' já apresentada.
-    \item Tradicional é um valor único (testada sobre todo o \textit{dataset} rotulado); Sintetizada é uma faixa (validação cruzada, 5 sementes).
-    \item \textit{Recall} e F1 superiores em \textbf{todas} as cinco sementes, nos dois CWEs, sem exceção.
+    \item Apenas a CWE-416 aprovada.
+    \item Pacote do registro público do SemGrep (\texttt{function-use-after-free}).
+    \item Pass cinco a cada seis casos reais.
+    \item Tradicional é um valor único (testada sobre todo o \textit{dataset} rotulado.)
+    \item Sintetizada é uma faixa (validação cruzada, 5 sementes).
+    \item \textit{Recall} e F1 superiores em \textbf{todas} as cinco sementes, sem exceção.
   \end{itemize}
   \vspace{0.1cm}
-  {\footnotesize\itshape [Espaço reservado para gráfico -- Images/grafico-comparacao-tradicional.svg]\par}
   \vfill
-  {\tiny\itshape CWE-416: Uso Após Liberação -- CWE-415: Liberação Dupla.\par}
+  {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}).\par}
 \end{frame}
 
 \begin{frame}{O que não funcionou: um limite da linguagem, não da busca}
   \begin{itemize}
     \small
-    \item \textbf{CWE-457}: o motor \textit{Open Source} do SemGrep não inicia rastreamento de contaminação a partir de uma declaração sem valor -- teto de \textit{recall} conhecido ($\approx$31\%), abaixo do piso do \textit{gate}.
-    \item \textbf{CWE-401} (vazamento): a condição é um argumento de vivacidade sobre \textbf{todos} os caminhos da função -- não uma relação entre dois pontos fixos.
+    \item \textbf{CWE-457}: o motor \textit{Open Source} do SemGrep não inicia rastreamento de contaminação teto de \textit{recall} conhecido ($\approx$31\%), abaixo do piso do \textit{gate}.
+    \item \textbf{CWE-401} (vazamento): a condição é um argumento de vivacidade é algo muito mais rico do que o que uma regra de taint consegue expressar.
     \item \textbf{CWE-415} (liberação dupla): fonte e sumidouro de contaminação são o \textbf{mesmo padrão} (\texttt{free(\$P)}); o motor de \textit{taint} casa a ocorrência contra si mesma.
     \item \textbf{CWE-476} (ponteiro nulo): a ausência de teste é uma condição sobre \textbf{caminhos}, não uma forma sintática única a excluir.
   \end{itemize}
   \vspace{0.02cm}
-  \footnotesize Confirmado por três métodos independentes -- modelo de 30B; gerador determinístico \textbf{sem LLM}; regra fixa compilada direto do grafo, \textbf{sem busca} -- o mesmo limite se repete nos três.
   \vfill
   {\tiny\itshape CWE-457: Variável Não Inicializada -- CWE-401: Vazamento de Memória -- CWE-415: Liberação Dupla -- CWE-476: Ponteiro Nulo.\par}
 \end{frame}
@@ -509,13 +581,17 @@
 \section{Conclusão}
 % ---------------------------------------------------------------
 \begin{frame}{Conclusão}
+  \footnotesize
   \begin{itemize}
-    \item \textbf{Hipótese parcialmente confirmada}: refutada na forma ampla (nem todas as 5 categorias); \textbf{não refutada} nas duas em que havia uma regra tradicional para comparar (CWE-416 e CWE-415).
-    \item Objetivos 1 (limites semânticos) e 3 (viabilidade local) \textbf{plenamente alcançados}; Objetivo 2 (comparação quantitativa) \textbf{parcialmente alcançado}.
-    \item Contribuição central: distinguir um limite de \textbf{busca} de um limite da \textbf{linguagem-alvo} do SemGrep -- generalizável para além deste trabalho.
-    \item Achado complementar: aprovação pelo \textit{gate} não garante alertas verdadeiros em código real -- revisão manual continua necessária.
-    \item \textbf{Próximos passos:} estender a validação de negativos do mundo real para além do \textit{git/git} (hoje o único repositório usado no \textit{gate}); explorar motores com sensibilidade a caminho (CodeQL, Joern) para os CWEs sem solução.
+    \item \textbf{Hipótese parcialmente confirmada}: refutada na forma ampla (nem todas as 5 categorias).
+    \item \textbf{Não refutada} no CWE-416, o único aprovado pelo \textit{gate}, onde a regra sintetizada superou a tradicional.
+    \item Objetivos 1 (limites semânticos) e 3 (viabilidade local) \textbf{alcançados}.
+    \item Objetivo 2 (comparação quantitativa) \textbf{parcialmente alcançado} (só CWE-416 e CWE-415 têm regra tradicional).
+    \item Contribuição desse trabalho: distinguir um limite de \textbf{busca} de um limite da \textbf{linguagem-alvo} do SemGrep -- generalizável para além deste trabalho.
+    \item Aprovação pelo \textit{gate} não garante alertas verdadeiros em código real -- revisão manual continua necessária.
+    \item \textbf{Próximos passos:} estender a validação de negativos do mundo real para além do \textit{git/git}; explorar motores com sensibilidade a caminho (CodeQL, Joern) para os CWEs sem solução.
   \end{itemize}
+  \vspace{-0.4cm}
 \end{frame}
 
 \begin{frame}[plain]
@@ -529,60 +605,6 @@
   {\normalsize Perguntas?\par}
   \vspace{0.6cm}
   {\footnotesize Caio Xavier da Silva \\ \texttt{[caioxaviercxs@gmail.com]}}
-\end{frame}
-
-% ---------------------------------------------------------------
-% APÊNDICE (slides de apoio para a arguição da banca -- fora dos 15 min)
-% ---------------------------------------------------------------
-\appendix
-\begin{frame}{Apêndice: slides de apoio}
-  Referencial teórico, trabalhos correlatos, formatos de regra,
-  combinações de modelo, o analisador de grafos de eventos e as
-  contribuições detalhadas (DSR) -- usar apenas se a banca perguntar.
-\end{frame}
-
-\begin{frame}{Apêndice -- Trabalhos correlatos}
-  \small
-  \begin{itemize}
-    \item \textbf{KNighter} (Yang et al., 2025): gera \textit{checkers} para o Clang Static Analyser a partir de \textit{commits} de correção; pioneiro, mas 32,2\% dos novos alertas eram falsos positivos.
-    \item \textbf{Hou et al. (2025)}: gera/migra/otimiza regras SemGrep via \textit{few-shot learning}; 41 regras válidas contra 37 do KNighter.
-    \item \textbf{RepoAudit} (Guo et al., 2025): agente autônomo com memória e validação por \textit{tree-sitter}; precisão de 78,43\%, mas reconsulta o LLM a cada auditoria.
-    \item \textbf{Este trabalho}: LLM só na geração da regra -- a execução final não tem custo de inferência.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Apêndice -- O analisador de grafos de eventos}
-  \small
-  \begin{itemize}
-    \item Componente complementar, em \textit{branch} separado, \textbf{sem nenhum LLM}.
-    \item Constrói, via \textit{tree-sitter}, um grafo de eventos de memória por função (alocação, liberação, uso, reatribuição) e faz consultas de alcançabilidade.
-    \item Nomes de função de alocação/liberação inferidos estatisticamente do próprio projeto -- sem lista manual.
-    \item Isolado: 134 de 138 casos de CWE-416 do Juliet, zero falsos positivos; aprovado em \textit{tmux}, PostgreSQL e SQLite; falhou no \textit{vim} (uma função de liberação mal inferida gerou 179 dos 234 alertas).
-    \item Usado também como fonte de exemplos para o gerador (\texttt{example\_mode=graph}).
-  \end{itemize}
-  \vfill
-  {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}).\par}
-\end{frame}
-
-\begin{frame}{Apêndice -- Formatos de regra e mecanismos avaliados}
-  \small
-  \textbf{Formatos de saída} (liberdade decrescente): \texttt{yaml}, \texttt{spec}, \texttt{template}, \texttt{form}, \texttt{formsearch}.
-  \vspace{0.15cm}
-
-  \textbf{\texttt{field\_correct}}: corrige um único campo por tentativa, em vez de reescrever a regra inteira -- ganho real, porém dependente da combinação de CWE, formato e porte do modelo; sem generalização.
-  \vspace{0.15cm}
-
-  \textbf{Combinações de modelo}: A (3B) a E (30B, \textit{Mixture-of-Experts}); a combinação D foi necessária para os melhores resultados -- modelos de 4B (combo C) são viáveis localmente, mas com desempenho inferior em mecanismos de correção mais refinados.
-\end{frame}
-
-\begin{frame}{Apêndice -- Contribuições (Design Science Research)}
-  \small
-  \begin{itemize}
-    \item \textbf{Constructo}: caracterização do compromisso entre liberdade sintática e eficácia, nos cinco formatos de regra.
-    \item \textbf{Método}: caracterização do \texttt{field\_correct} como ganho condicional, não geral.
-    \item \textbf{Modelo}: evidência de que a variação entre sementes pode exceder o efeito de qualquer mecanismo experimental.
-    \item \textbf{Instanciação}: \textit{pipeline} completo e executável em \textit{hardware} de consumo, com modelos locais de código aberto.
-  \end{itemize}
 \end{frame}
 
 \end{document}

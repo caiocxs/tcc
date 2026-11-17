@@ -43,18 +43,6 @@
 - Uma alternativa seria jogar o código inteiro para um LLM.
     - Custo de dezenas de milhões de tokens, dias de processamento, e traz risco de alucinação.
 
-### Slide: Pergunta de pesquisa (~1,5 min)
-**No TCC:** Seção 1.2 "Formulação do problema" (p. 17-18).
-> "Um *framework* multi-agente baseado em LLMs é capaz de sintetizar regras para o SemGrep que detectem vulnerabilidades em código C com *recall* e precisão estatisticamente superiores aos do *ruleset* tradicional da ferramenta?" (citação direta, Seção 1.2, p. 17)
-> "O escopo restringe-se à linguagem C, a cinco categorias de CWE [...] e ao SemGrep como motor de execução das regras." (Seção 1.2, p. 18) — a lista e definição das cinco CWEs está na Seção 2.2.2.2 "*Common Weakness Enumeration*" (p. 32, referencial teórico, fora do escopo dos 15 min).
-
-**Fala sugerida:**
-- Concluindo para a pergunta central do trabalho:
-    - [Slide]
-    - Com recall e precisão estatisticamente superiores ao ruleset tradicional.
-
-- Com o seguinte escopo e CWEs;
-
 ---
 
 ## 2. Ferramentas utilizadas
@@ -109,6 +97,18 @@
 
 - Esse conjunto também foi utilizado para um dos modos de exemplo do gerador: o modo `pairs`.
 
+
+### Slide: Pergunta de pesquisa (~1,5 min)
+**No TCC:** Seção 1.2 "Formulação do problema" (p. 17-18).
+> "Um *framework* multi-agente baseado em LLMs é capaz de sintetizar regras para o SemGrep que detectem vulnerabilidades em código C com *recall* e precisão estatisticamente superiores aos do *ruleset* tradicional da ferramenta?" (citação direta, Seção 1.2, p. 17)
+> "O escopo restringe-se à linguagem C, a cinco categorias de CWE [...] e ao SemGrep como motor de execução das regras." (Seção 1.2, p. 18) — a lista e definição das cinco CWEs está na Seção 2.2.2.2 "*Common Weakness Enumeration*" (p. 32, referencial teórico, fora do escopo dos 15 min).
+
+**Fala sugerida:**
+- Concluindo para a pergunta central do trabalho:
+    - [Slide]
+    - Com recall e precisão estatisticamente superiores ao ruleset tradicional.
+
+- Com o seguinte escopo e CWEs;
 ---
 
 ## 3. Objetivos e método
@@ -128,7 +128,7 @@
 
 - A hipótese sendo que o modelo automatizado detecta vulnerabilidades com taxas estatisticamente superiores às abordagens tradicionais. 
 
-### Slide: Arquitetura implementada (~1,5 min)
+### Slide: Arquitetura implementada (~1 min) — slide em tópicos
 **No TCC:** Seção 3.2.3 "Arquitetura efetivamente implementada" (p. 55-56) e Seção 3.2.7 "Protocolo de avaliação" (p. 59).
 > "O sistema implementado estrutura-se em dois papéis centrais executados por modelos de linguagem -- gerador e corretor -- e um componente determinístico, o *gate* de avaliação." (3.2.3, p. 55)
 > "Uma regra é considerada **aprovada** quando [...] atinge *recall* mínimo de 50%, não produz nenhum falso positivo nos casos sintéticos do Juliet Test Suite e não ultrapassa 0,1 alertas por mil linhas de código (KLOC)." (3.2.3, p. 56)
@@ -137,30 +137,34 @@
 > "em vez de reescrever a regra inteira a cada tentativa de correção, o corretor responde apenas com o novo valor de um único campo [...], escolhido ciclicamente a cada tentativa, enquanto o restante da regra permanece inalterado." (3.2.4 "Formatos de saída das regras", p. 57)
 
 **Fala sugerida:**
-- A arquitetura implementada é mais simplificada do que a antiga. 
+- A arquitetura implementada é mais simplificada do que a antiga: dois papéis de LLM, o Gerador e o Corretor, e um componente determinístico no meio, o Gate.
 
-- Com dois papéis de LLM e um componente determinístico no meio.
-
-- O Gerador recebe exemplos de código vulnerável e seguro e escreve uma regra candidata.
-
-- Essa regra passa pelo Gate, que é determinístico:
+- O Gate é o centro de tudo:
     - Ele valida a sintaxe, roda o SemGrep de verdade, e mede recall, precisão e falsos positivos.
 
-- Se a regra é aprovada, ela vai para o conjunto final. 
-- Se não, o Gate devolve o relatório de erro para o Corretor, que é outro papel de LLM, e ele gera uma nova versão — esse ciclo se repete até seis vezes.
+- Nosso critério de aprovação é rigoroso de propósito:
+    - Recall de pelo menos 50%, zero falsos positivos no Juliet Test Suite, e no máximo 0,1 alertas por mil linhas de código rodando sobre código real assumido como correto.
 
-- Esse teto de seis não veio de uma otimização formal.
+- Se a regra é reprovada, o Corretor gera uma nova versão a partir do relatório de erro do Gate — e esse ciclo se repete até seis vezes.
+    - Esse teto de seis não veio de uma otimização formal.
     - Começamos com três — era o limite do desenho original — e vimos nas primeiras execuções o corretor travar, repetindo a mesma regra errada já na 3ª ou 4ª tentativa.
-    - Mesmo dobrando, em boa parte das execuções, ele continuou repetindo a regra anterior em até 5 das 6 tentativas disponíveis. 
-    - Foi exatamente esse travamento que levou criação no `field_correct`: em vez de pedir para o corretor reescrever a regra inteira de novo, ele corrige apenas o campo que o Gate apontou como errado.
+    - Mesmo dobrando, em boa parte das execuções, ele continuou repetindo a regra anterior em até 5 das 6 tentativas disponíveis.
+    - Foi exatamente esse travamento que levou à criação do `field_correct`: em vez de pedir para o corretor reescrever a regra inteira de novo, ele corrige apenas o campo que o Gate apontou como errado.
 
-- Temos um critério de aprovação é rigoroso de propósito:
-    - Recall de pelo menos 50%, zero falsos positivos no Juliet Test Suite, e no máximo 0,1 alertas por mil linhas de código rodando sobre código real assumido como correto. 
-    - E toda configuração relevante foi avaliada por validação cruzada, com até cinco sementes de particionamento diferentes.
+- E toda configuração relevante foi avaliada por validação cruzada, com até cinco sementes de particionamento diferentes.
+    - Semente é o número que define o sorteio de como o Juliet Test Suite é dividido nas 5 partes (folds) da validação cruzada.
+    - Trocar a semente refaz esse sorteio do zero; numa mesma semente, as 5 dobras só se revezam sendo teste, sem novo sorteio.
 
-- Semente é o número que define o sorteio de como o Juliet Test Suite é dividido nas 5 partes (folds) da validação cruzada.
+### Slide: Arquitetura implementada: fluxo (~0,5 min) — slide só com o diagrama
+**No TCC:** Seção 3.2.3 "Arquitetura efetivamente implementada" (p. 55-56).
 
-- Trocar a semente refaz esse sorteio do zero; numa mesma semente, as 5 dobras só se revezam sendo teste, sem novo sorteio.
+**Fala sugerida:**
+- Visualmente, o fluxo é este:
+    - O Gerador recebe exemplos de código vulnerável e seguro e escreve uma regra candidata.
+    - Essa regra passa pelo Gate, que é determinístico.
+
+- Se a regra é aprovada, ela vai para o conjunto final.
+- Se não, o Gate devolve o relatório de erro para o Corretor, que é outro papel de LLM, e ele gera uma nova versão, que volta para o Gate.
 
 ---
 
@@ -266,6 +270,7 @@
 
 - Olhando rápido: o CWE-416, uso após liberação, foi o único que teve dobras efetivamente aprovadas pelo Gate.
     - Só em duas das cinco sementes. 
+    - E um detalhe importante: esse recall de até 100% na tabela é a média das cinco dobras de cada semente, não o recall da dobra que de fato passou no Gate. A dobra aprovada teve recall de 57% — bem mais baixo, mas com ruído baixo o suficiente pra aprovar.
 
 - O CWE-415, double free, chegou perto, com recall relevante, mas nunca foi aprovado. 
 
@@ -285,6 +290,7 @@
 
 - Isolamos as variáveis numa rodada extra e descobrimos que o `project_apis` que aumentava, quanto mais informação pode ajudar ou confundir, e esse foi o caso. 
     - Removendo ele e mantendo só o `guard`, chegamos à melhor configuração do trabalho inteiro: recall de 89,2% a 100%, com falsos positivos entre 12 e 216 — e duas das cinco sementes efetivamente aprovadas pelo Gate.
+    - Mas essas duas coisas não são o mesmo resultado: a dobra que de fato passou no Gate teve recall de 57%, bem abaixo do topo da faixa — foi justamente a dobra de recall mais baixo que teve ruído baixo o suficiente pra aprovar. As dobras com recall mais alto foram as que geraram ruído demais e reprovaram.
 *(Se já tiver o gráfico no lugar do placeholder: 'o gráfico mostra bem esse salto e a queda depois'.)*"
 
 ### Slide: CWE-415: a lição metodológica das sementes (~1,5 min)
@@ -302,24 +308,21 @@
 - Quase foi passado despercebido sua instabilidade.
     - A regra nunca foi aprovada pelo Gate — porque recall alto e baixo ruído em código real nunca aconteceram juntos, na mesma semente.
 
-### Slide: A regra sintetizada supera a regra tradicional (~2 min — slide mais importante)
-**No TCC:** Seção 3.4.6 "Comparação com um analisador estático tradicional" (p. 71-73) + Tabela 9 "*Comparação entre as regras sintetizadas e um analisador tradicional*" (p. 72) + Figura 14 (placeholder, p. 72).
+### Slide: CWE-416: a regra sintetizada supera a tradicional (~2 min — slide mais importante)
+**No TCC:** Seção 3.4.6 "Comparação com um analisador estático tradicional" (p. 71-73) + Tabela 9 "*Comparação entre as regras sintetizadas e um analisador tradicional*" (p. 72) + Figura 14 (placeholder, p. 72). O slide mostra só o CWE-416; a Tabela 9 do TCC traz também o CWE-415.
 > "O registro público [...] do SemGrep [...] disponibiliza o pacote `r/c` [...] duas regras mostraram-se diretamente relevantes [...]: `c.lang.security.function-use-after-free`, para o CWE-416, e `c.lang.security.double-free` [...] para o CWE-415." (3.4.6, p. 71)
 > "a melhor configuração sintetizada por este trabalho superou a regra tradicional em *recall* em todas as cinco sementes avaliadas, sem exceção." (3.4.6, p. 72)
 > "a precisão [...] apresenta um quadro mais equilibrado [...] evidenciando que o ganho de *recall* [...] não ocorre sem nenhum custo de precisão, ainda que o ganho líquido, medido pelo F1-Score, seja favorável em todas as sementes avaliadas." (3.4.6, p. 73)
 
 **Fala sugerida:**
-- De todos os experimentos, apenas duas CWEs passaram do gate.
+- Dos cinco CWEs, só o CWE-416 teve aprovação consistente do Gate — é com ele que faço a comparação.
 
-- Temos duas regras relevantes do registro público e gratuito do SemGrep para esses CWEs.
+- O registro público e gratuito do SemGrep tem uma regra relevante para esse CWE, a `function-use-after-free`.
 
-- Para o CWE-416, a regra tradicional tem recall de 17,4%, deixando passar cerca de cinco em cada seis casos reais de uso após liberação.
-- Com a nossa melhor configuração chega de 89,2% a 100%.
+- Ela tem recall de 17,4%, deixando passar cerca de cinco em cada seis casos reais de uso após liberação.
+- Com a nossa melhor configuração, o recall chega de 89,2% a 100%.
 
-- Para o CWE-415, a tradicional tem 28,7% de recall;
-- A sintetizada vai de 43,3% a 76,3%.
-
-- Essa superioridade em recall e em F1-Score acontece em todas as cinco sementes avaliadas, nos dois CWEs, sem nenhuma exceção. 
+- Essa superioridade em recall e em F1-Score acontece em todas as cinco sementes avaliadas, sem nenhuma exceção.
 
 - A precisão tem um quadro mais equilibrado, em algumas sementes a regra tradicional é mais precisa, mas o ganho, medido pelo F1, é sempre favorável à regra sintetizada.
 *(Pausa curta aqui. É o número que a banca vai lembrar.)*"
@@ -375,15 +378,15 @@
 > "uma regra pode satisfazer integralmente um critério de aprovação quantitativo [...] sem que seus alertas individuais correspondam a defeitos verdadeiros quando lidos manualmente [...] o que reforça [...] a necessidade de revisão manual amostral." (4.2, p. 75)
 > "propõe-se: (i) validar as configurações já aprovadas sobre múltiplos repositórios de negativos do mundo real [...]; [...] (vi) [...] investigar um motor de análise estática com sensibilidade a caminho [...] (como o CodeQL ou o Joern)." (4.3, p. 76)
 
-**No slide:** 5 bullets — hipótese parcialmente confirmada; objetivos 1/3 plenos, 2 parcial; contribuição central (busca × linguagem-alvo); achado complementar (gate ≠ verdade); próximos passos.
+**No slide:** 7 bullets — hipótese parcialmente confirmada; não refutada no CWE-416; objetivos 1/3 alcançados; objetivo 2 parcial; contribuição central (busca × linguagem-alvo); achado complementar (gate ≠ verdade); próximos passos.
 
 **Fala sugerida:**
 - Voltando à hipótese: 
     - Ela não se confirma na forma ampla, para as cinco categorias. 
-    - Mas nas duas categorias em que conseguimos uma regra tradicional para comparar, a hipótese não é refutada: o ganho é real.
+    - Mas no CWE-416 — o único que o Gate aprovou, e o que mostrei na comparação com a regra tradicional — a hipótese não é refutada: o ganho é real.
 
 - Dos três objetivos específicos, o primeiro e o terceiro foram plenamente alcançados; 
-- O segundo, parcialmente — porque só pude comparar quantitativamente com a linha de base tradicional em dois CWEs.
+- O segundo, parcialmente — porque só existia regra tradicional para comparar em dois dos cinco CWEs, o 416 e o 415.
 
 - A contribuição deste trabalho é a distinção entre um limite de busca e um limite da linguagem-alvo. 
     - Isso é algo que qualquer pessoa tentando sintetizar regras para o SemGrep — ou para qualquer outra ferramenta baseada em padrões — pode usar antes de gastar tempo testando variações de prompt ou de modelo.

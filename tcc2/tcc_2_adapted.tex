@@ -1665,7 +1665,7 @@ A Tabela \ref{tab:resumocwes} sintetiza o melhor resultado obtido para cada cate
         CWE-457 & Combo C, \texttt{formsearch} & 0\%--18,75\% & 0 de 2 \\
         \bottomrule
     \end{tabular}
-    \legend{Fonte: Elaborado pelo autor (2026). *Cada semente aprovada contribui com, no mínimo, uma de cinco dobras.}
+    \legend{Fonte: Elaborado pelo autor (2026). *Cada semente aprovada contribui com, no mínimo, uma de cinco dobras. O \textit{recall} do CWE-416 é a média das cinco dobras de cada semente; a dobra especificamente aprovada em cada uma das duas sementes obteve 57,14\% de \textit{recall}, não o valor superior da faixa (Seção \ref{sec:resultadoscwe416}).}
 \end{table}
 
 \subsection{CWE-457: um alvo estruturalmente inadequado}
@@ -1713,7 +1713,7 @@ O levantamento das 120 execuções de validação cruzada acumuladas ao longo do
         \texttt{pairs} + \texttt{guard} & 89,2\%--100\% & 12--216 & 2 de 5 \\
         \bottomrule
     \end{tabular}
-    \legend{Fonte: Elaborado pelo autor (2026)}
+    \legend{Fonte: Elaborado pelo autor (2026). O \textit{recall} (faixa) de cada linha é a média das cinco dobras da validação cruzada por semente, não o \textit{recall} da dobra especificamente aprovada; para \texttt{pairs + guard}, essa dobra obteve 57,14\% de \textit{recall} em cada uma das duas sementes aprovadas, acompanhado de 0,03 a 0,04 alertas por KLOC no mundo real.}
 \end{table}
 
 \par
@@ -1748,7 +1748,9 @@ Conclui-se que a aprovação original não foi resultado de uma sorte de \textit
 \par
 A combinação do parâmetro \texttt{pairs} com os mecanismos \texttt{guard} e \texttt{project\_apis} elevou ainda mais o \textit{recall} (80,3\% a 97,1\% em duas sementes), porém às custas de um aumento severo de ruído (619 a 799 falsos positivos; 25,6 a 47,3 alertas por KLOC no mundo real), não resultando em nenhuma dobra aprovada.
 \par
-Por fim, isolando apenas o mecanismo \texttt{guard} (sem o \texttt{project\_apis}) e estendendo para cinco sementes, obteve-se o melhor resultado do trabalho: duas das cinco sementes passaram a obter ao menos uma dobra aprovada (contra apenas uma das cinco sementes da configuração \texttt{pairs} isolada), com uma faixa de \textit{recall} mais concentrada (89,2\% a 100\%).
+Por fim, isolando apenas o mecanismo \texttt{guard} (sem o \texttt{project\_apis}) e estendendo para cinco sementes, obteve-se o melhor resultado do trabalho: duas das cinco sementes passaram a obter ao menos uma dobra aprovada (contra apenas uma das cinco sementes da configuração \texttt{pairs} isolada), e o \textit{recall} médio das cinco dobras de cada semente concentrou-se numa faixa mais estreita (89,2\% a 100\%).
+\par
+Esses dois números não descrevem o mesmo resultado: a dobra efetivamente aprovada em cada uma dessas duas sementes obteve 57,14\% de \textit{recall} -- o valor mais baixo entre as cinco dobras de sua semente --, acompanhado de uma taxa de alerta no mundo real de apenas 0,03 a 0,04 alertas por KLOC, suficientemente baixa para satisfazer o \textit{gate}; as demais dobras, com \textit{recall} mais alto, foram justamente as que geraram ruído excessivo e não foram aprovadas.
 \par
 Esse resultado indica que o parâmetro \texttt{project\_apis} era o principal responsável pelo ruído adicional observado, e que o mecanismo \texttt{guard}, isoladamente, contribui de fato para a confiabilidade da aprovação, sem comprometer o \textit{recall} da configuração de referência.
 
