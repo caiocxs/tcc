@@ -9,7 +9,8 @@
 % Por isso, em relação ao documento escrito, foram DELIBERADAMENTE
 % OMITIDOS da fala principal: o referencial teórico em profundidade
 % (AST, CFG, DFA, arquitetura Transformer, NLP, agentes), o
-% detalhamento de cada trabalho correlato, o detalhamento fino dos
+% detalhamento fino de cada trabalho correlato (só uma síntese em 2
+% slides entrou na fala principal), o detalhamento fino dos
 % formatos de regra/combinações de modelo (fica só um resumo rápido,
 % o nível de detalhe completo está no apêndice) e o cronograma (já
 % cumprido). Esse material fica no APÊNDICE, como apoio para a
@@ -23,6 +24,10 @@
 % quem não leu o TCC. O vocabulário de configurações foi desmembrado
 % em um slide por modo de exemplos (findings/pairs/graph) a pedido do
 % autor, em vez de um único slide resumido.
+%
+% Uma seção de TRABALHOS RELACIONADOS (2 slides: resumo dos três
+% trabalhos e comparação com este) FOI INCLUÍDA na fala principal,
+% a pedido explícito do autor.
 %
 % IMAGENS: três gráficos (CWE-416, CWE-415, comparação com a regra
 % tradicional) ainda não foram inseridos -- os slides correspondentes
@@ -184,6 +189,8 @@
 %   - Problema e motivação .......... ~3 min   (2 slides)
 %   - Ferramentas utilizadas ......... ~2,5 min (3 slides: SemGrep, exemplo
 %                                                 de regra, Juliet)
+%   - Trabalhos relacionados ......... ~2 min   (2 slides: resumo dos três
+%                                                 trabalhos, comparação)
 %   - Objetivos e método ............ ~2,5 min (3 slides: objetivos, arquitetura
 %                                                 em tópicos, arquitetura em diagrama)
 %   - Resultados ..................... ~11,5 min (12 slides, incl. 7 slides
@@ -197,8 +204,9 @@
 %                                                 do teste isolado do Juliet)
 %   - Conclusão ...................... ~1,5 min (1 slide)
 % Capa + roteiro + encerramento não entram nesse orçamento.
-% Referencial teórico em profundidade, trabalhos correlatos em
-% detalhe, o detalhamento fino de formatos de regra/combos de modelo
+% Soma atual dos blocos: ~23 min (acima do alvo de ~20; enxugar se preciso).
+% Referencial teórico em profundidade, o detalhe de cada trabalho
+% correlato, o detalhamento fino de formatos de regra/combos de modelo
 % e o cronograma ficam no apêndice (sem tempo fixo -- usar apenas se
 % a banca perguntar).
 % ===============================================================
@@ -292,6 +300,40 @@
   \small CWE-401 (vazamento) \quad CWE-415 (liberação dupla) \quad CWE-416 (uso após liberação)\\
   CWE-457 (variável não inicializada) \quad CWE-476 (ponteiro nulo)
   \end{center}
+\end{frame}
+
+% ---------------------------------------------------------------
+\section{Trabalhos relacionados}
+% ---------------------------------------------------------------
+\begin{frame}{Trabalhos relacionados}
+  \begin{itemize}
+    \item \textbf{KNighter} (Yang et al., SOSP 2025): a partir de \textit{commits} de correção, gera \textit{checkers} para o Clang Static Analyzer; 37 \textit{checkers} plausíveis relataram 92 novos \textit{bugs}, com 32,2\% de falsos positivos após inspeção manual.
+    \item \textbf{Hou et al.} (QRS 2025): gera, migra e otimiza regras do \textbf{SemGrep} por \textit{few-shot learning}; 41 regras válidas contra 37 do KNighter.
+    \item \textbf{RepoAudit} (Guo et al., ICML 2025): agente autônomo que audita repositórios inteiros; precisão de 78,43\% (40 verdadeiros e 11 falsos positivos), mas o modelo é consultado a cada auditoria (US\$ 2,54 por projeto).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Trabalhos relacionados: o que este trabalho muda}
+  \scriptsize
+  \begin{table}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{p{2.0cm}p{3.6cm}p{3.1cm}p{3.7cm}}
+  \toprule
+  \textbf{Trabalho} & \textbf{Papel do LLM} & \textbf{Motor} & \textbf{Limitação apontada} \\
+  \midrule
+  KNighter & Sintetiza verificadores a partir de \textit{commits} & \mbox{Clang Static Analyzer} & Restrito a C/C++; falsos positivos em lógica de estado complexa \\
+  Hou et al. & Gera, otimiza e migra regras & SemGrep & Muitos falsos positivos; dificuldade com fluxo de dados \\
+  RepoAudit & Audita o repositório (agente com memória e validadores) & Claude 3.5 Sonnet + \textit{tree-sitter} & Custo a cada auditoria; análise limitada a cadeias de quatro funções \\
+  \midrule
+  \textbf{Este trabalho} & Gera e corrige a regra, com exemplos do Juliet & SemGrep & Limites da linguagem de regras do SemGrep (CWE-401, 415 e 476) \\
+  \bottomrule
+  \end{tabular}
+  \end{table}
+  \vspace{0.1cm}
+  \begin{itemize}
+    \item O LLM atua só na geração da regra; a execução no SemGrep não tem custo de inferência -- contraste com o RepoAudit.
+    \item Exemplos vêm do Juliet (pares vulnerável/seguro), e não de histórico de \textit{commits}.
+  \end{itemize}
 \end{frame}
 
 % ---------------------------------------------------------------
@@ -552,16 +594,16 @@
   \end{table}
   \begin{itemize}
     \footnotesize
-    \item Apenas a CWE-416 aprovada.
-    \item Pacote do registro público do SemGrep (\texttt{function-use-after-free}).
-    \item Pass cinco a cada seis casos reais.
-    \item Tradicional é um valor único (testada sobre todo o \textit{dataset} rotulado.)
+    \item Apenas o CWE-416 foi aprovado pelo \textit{gate}.
+    \item Tradicional: pacote \texttt{r/c} do registro público do SemGrep (\texttt{function-use-after-free}); deixa passar cerca de cinco em cada seis casos reais.
+    \item Tradicional é um valor único (testada sobre todo o \textit{dataset} rotulado).
     \item Sintetizada é uma faixa (validação cruzada, 5 sementes).
     \item \textit{Recall} e F1 superiores em \textbf{todas} as cinco sementes, sem exceção.
+    \item CWE-415 (nunca aprovado pelo \textit{gate}): também superou em \textit{recall} (43,3--76,3\% contra 28,7\%) e F1 (0,50--0,63 contra 0,364).
   \end{itemize}
   \vspace{0.1cm}
   \vfill
-  {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}).\par}
+  {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}) -- CWE-415: Liberação Dupla (\textit{Double Free}).\par}
 \end{frame}
 
 \begin{frame}{O que não funcionou: um limite da linguagem, não da busca}

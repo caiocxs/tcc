@@ -8,10 +8,10 @@
 
 ## Roteiro da apresentação (~15s)
 **No TCC:** corresponde ao Sumário do documento (os quatro capítulos: Introdução, Revisão Bibliográfica, Desenvolvimento, Conclusão).
-**No slide:** `\tableofcontents` — lista as cinco seções da apresentação: Problema e motivação / Ferramentas utilizadas / Objetivos e método / Resultados / Conclusão.
+**No slide:** `\tableofcontents` — lista as seis seções da apresentação: Problema e motivação / Ferramentas utilizadas / Trabalhos relacionados / Objetivos e método / Resultados / Conclusão.
 
 **Fala sugerida:**
-"Vou seguir cinco blocos: o problema e a motivação, uma breve apresentação das ferramentas que uso, os objetivos e o método, os resultados — que é onde vou passar a maior parte do tempo — e a conclusão."
+"Vou seguir seis blocos: o problema e a motivação, uma breve apresentação das ferramentas que uso, os trabalhos relacionados, os objetivos e o método, os resultados — que é onde vou passar a maior parte do tempo — e a conclusão."
 
 ---
 
@@ -111,7 +111,48 @@
 - Com o seguinte escopo e CWEs;
 ---
 
-## 3. Objetivos e método
+## 3. Trabalhos relacionados
+
+*(Seção curta, incluída a pedido do autor: situa o trabalho na literatura antes dos objetivos. O detalhe de cada artigo fica na versão de consulta, no apêndice deste roteiro.)*
+
+### Slide: Trabalhos relacionados (~1 min)
+**No TCC:** Seção 2.3 "Trabalhos correlatos" (p. 44-52): 2.3.1 KNighter (p. 45-46), 2.3.2 Hou et al. (p. 47-48), 2.3.3 RepoAudit (p. 49-51).
+> "KNighter relata dentre 37 *checkers* plausíveis, foram relatados 92 novos *bugs*, que depois de uma inspeção manual, 32,2% foram falsos positivos." (2.3.1, p. 46)
+> "Resultados de Hou et al. criaram 41 regras válidas comparadas com as 37 geradas por Yang et al." (2.3.2, p. 48)
+> "O agente [RepoAudit] [...] totalizando 40 verdadeiros positivos e 11 falsos positivos, uma precisão de 78,43%." (2.3.3, p. 50)
+
+**Fala sugerida:**
+- Três trabalhos recentes atacam o mesmo problema — as limitações da análise estática tradicional — e cada um dá um papel diferente ao LLM.
+
+- O KNighter foi o pioneiro: a partir de commits de correção, o LLM sintetiza checkers para o Clang Static Analyzer.
+    - Os 37 checkers plausíveis acharam 92 bugs novos, mas 32% desses alertas eram falsos positivos.
+
+- O Hou e colegas também sintetizam regras, mas para o SemGrep — o mesmo motor que eu uso.
+    - Além de gerar, eles migram e otimizam regras entre linguagens, e superaram o KNighter em regras válidas: 41 contra 37.
+
+- O RepoAudit é o mais sofisticado: um agente que audita o repositório inteiro, com memória e validadores.
+    - Chega a 78% de precisão, mas consulta o LLM a cada auditoria — são cerca de 2,54 dólares por projeto, e esse custo se repete toda vez.
+
+### Slide: Trabalhos relacionados: o que este trabalho muda (~45s)
+**No TCC:** Seção 2.3.4 "Síntese comparativa" + Tabela 2 (p. 51-52); os parágrafos "Para o presente trabalho" de cada subseção (2.3.1 a 2.3.3) sustentam o contraste.
+> "KNighter utiliza somente *commits* para seu treinamento [...] este trabalho recorre ao *dataset* de [Juliet]." (2.3.1, p. 45-46)
+> "o RepoAudit consulta o modelo a cada auditoria, de modo que o custo se repete a cada execução [...], enquanto este trabalho utiliza a LLM apenas para gerar regras, que depois são executadas pelo SemGrep sem custo de inferência." (2.3.3, p. 49-51)
+
+**Fala sugerida:**
+- Na tabela, o que importa é o papel do LLM e a limitação que cada trabalho declara.
+    - O KNighter fica preso ao ecossistema C/C++ e erra em lógica de estado complexa.
+    - O Hou e colegas ainda têm muitos falsos positivos e dificuldade com fluxo de dados.
+    - E o RepoAudit tem custo a cada auditoria e alcance limitado a cadeias de quatro funções.
+
+- No meu trabalho, o LLM gera e corrige a regra, usando exemplos do Juliet em vez de histórico de commits — o KNighter só aprende de commits, o que limita o que ele consegue detectar.
+
+- E a diferença frente ao RepoAudit: aqui o LLM só atua na hora de gerar a regra; depois, quem executa é o SemGrep, sem custo de inferência.
+
+- A minha limitação aparece na última linha, e é o que vou mostrar nos resultados: a própria linguagem de regras do SemGrep não consegue expressar três dos cinco CWEs — o 401, o 415 e o 476.
+
+---
+
+## 4. Objetivos e método
 
 ### Slide: Objetivos e hipótese (~1 min)
 **No TCC:** Seção 1.3 "Objetivos e hipótese" (p. 18-21): Subseção 1.3.1 "Objetivo geral" (p. 18), Subseção 1.3.2 "Objetivos específicos" (p. 19), Subseção 1.3.3 "Hipótese ou critério de validação" (p. 20).
@@ -168,7 +209,7 @@
 
 ---
 
-## 4. Resultados
+## 5. Resultados
 
 *(Este é o bloco mais longo — é aqui que está a evidência do trabalho. Fale devagar, deixe os números "assentarem".)*
 
@@ -325,6 +366,8 @@
 - Essa superioridade em recall e em F1-Score acontece em todas as cinco sementes avaliadas, sem nenhuma exceção.
 
 - A precisão tem um quadro mais equilibrado, em algumas sementes a regra tradicional é mais precisa, mas o ganho, medido pelo F1, é sempre favorável à regra sintetizada.
+
+- Para ser transparente: o CWE-415 também tem regra tradicional, e a sintetizada também superou em recall e F1 (recall de 43,3% a 76,3% contra 28,7%) — mas ele nunca foi aprovado pelo Gate, então trato como evidência secundária.
 *(Pausa curta aqui. É o número que a banca vai lembrar.)*"
 
 ### Slide: O que não funcionou — um limite da linguagem, não da busca (~1,5 min)
@@ -368,7 +411,7 @@
 
 ---
 
-## 5. Conclusão
+## 6. Conclusão
 
 ### Slide: Conclusão (~1,5 min)
 **No TCC:** Seção 4.1 "Retomada do problema e dos objetivos" (p. 74) + Seção 4.2 "Contribuições para a Computação" (p. 75) + Seção 4.3 "Limitações e trabalhos futuros" (p. 76).
@@ -410,6 +453,7 @@
 Estes quatro slides não entram nos 15 minutos. Use-os como referência rápida para responder; não precisa decorar um discurso, só saber onde cada número está.
 
 ### Trabalhos correlatos
+*(O resumo agora está no corpo da apresentação, seção 3; esta é a versão de consulta, com as citações do TCC.)*
 **No TCC:** Seção 2.3 "Trabalhos correlatos" (p. 44-52): 2.3.1 KNighter (p. 45-46), 2.3.2 Hou et al. (p. 47-48), 2.3.3 RepoAudit (p. 49-51), 2.3.4 "Síntese comparativa" + Tabela 2 (p. 51-52).
 > "KNighter relata dentre 37 *checkers* plausíveis, foram relatados 92 novos *bugs*, que depois de uma inspeção manual, 32,2% foram falsos positivos." (2.3.1, p. 46)
 > "Resultados de Hou et al. criaram 41 regras válidas comparadas com as 37 geradas por Yang et al." (2.3.2, p. 48)
