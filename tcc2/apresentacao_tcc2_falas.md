@@ -24,7 +24,7 @@
 > "Estima-se que, no momento da divulgação, entre 24% e 55% dos servidores HTTPS do milhão de *sites* mais acessados do mundo estavam vulneráveis." (Cap. 1, p. 11)
 > "A Microsoft relata que cerca de 70% das vulnerabilidades[...] são problemas de segurança de memória[...] cerca de 70% eram problemas de segurança de memória, e metade destas, do tipo uso de memória após a sua liberação." (Cap. 1, p. 11)
 > "Pesquisas revelam que menos de 5% das lógicas de detecção utilizadas na indústria são criadas por usuários comuns." (Tabela 1 — *Limitações da análise estática tradicional*, p. 12, linha "Esforço Humano")
-> "Estudos empíricos confirmam que essa abordagem pode consumir dezenas de milhões de *tokens* e exigir dias de processamento contínuo [...] Essa sobrecarga de contexto exacerba o risco de alucinações." (Seção 1.1, p. 16)
+> "Estudos empíricos confirmam que essa abordagem pode consumir dezenas de milhões de *tokens* e exigir dias de processamento contínuo [...] Essa sobrecarga de contexto exacerba o risco de alucinações." (Seção 1.1, p. 15)
 
 **Fala sugerida:**
 - Para dimensionar o problema
@@ -48,13 +48,13 @@
 ## 2. Ferramentas utilizadas
 
 ### Slide: Ferramenta: SemGrep (~1 min)
-**No TCC:** Seção 1.1 "Contextualização do problema" (p. 17) — introdução breve, no fechamento da seção; e Seção 2.2.1.6 "Análise estática baseada em regras" (p. 29-30, referencial teórico) — definição técnica completa.
+**No TCC:** Seção 1.1 "Contextualização do problema" (p. 17) — introdução breve, no fechamento da seção; e Seção 2.2.1.6 "Análise estática baseada em regras" (p. 29-31, referencial teórico) — definição técnica completa.
 > "O SemGrep é uma ferramenta de código aberto na qual o usuário descreve, em arquivos no formato YAML, regras cujos padrões imitam a própria sintaxe da linguagem analisada." (Seção 1.1, p. 17)
 > "O SemGrep disponibiliza um *ruleset* oficial [...] neste trabalho, é a esse conjunto que se refere a expressão *ruleset* tradicional." (Seção 1.1, p. 17)
 > "Formalmente, SemGrep é uma ferramenta de análise estática que suporta estruturas complexas e verificações básicas de fluxo de dados no código, permitindo inspeções sem execução [...] para identificar vulnerabilidades de segurança." (Seção 2.2.1.6, p. 29)
 > "SemGrep converte código em uma árvore de sintaxe abstrata universal (UAST), aplicando um *pattern-matching* uniforme em mais de 30 linguagens." (Seção 2.2.1.6, p. 30)
 > "Metavariáveis [...] são atribuídas quando SemGrep identifica um padrão que se encaixa [...] se a metavariável é reutilizada na mesma regra, o SemGrep exigirá que o valor capturado seja exatamente o mesmo, o que permite *Data Flow*." (Seção 2.2.1.6, p. 30)
-> "Ellipsis/Curinga (...), representando qualquer sequência de coisas [...] tornando SemGrep uma ferramenta abstraída." (Seção 2.2.1.6, p. 30)
+> "Ellipsis/Curinga (...), representando qualquer sequência de coisas [...] tornando SemGrep uma ferramenta abstraída." (Seção 2.2.1.6, p. 30-31)
 
 **Fala sugerida:**
 - O SemGrep é um analisador estático de código aberto. 
@@ -69,6 +69,7 @@
 - A ferramenta contém um modo *taint*: declara-se uma fonte de contaminação, e se rastreia o fluxo de dados ao invés de procurar padrões sintáticos isolados.
 
 - E uma última coisa importante: o SemGrep tem um conjunto de regras público, de várias CWEs de diversas linguagens, mantido pela comunidade, é esse conjunto que será nossa "regras tradicionais".
+    - Das cinco CWEs do nosso escopo, só duas têm regra tradicional direta nesse pacote: a 416, uso após liberação, e a 415, liberação dupla.
 
 ### Slide: Exemplo de regra SemGrep (~30s)
 **No TCC:** Seção 1.1 "Contextualização do problema" (p. 17-18), Figura 3 "*Exemplo de regra criada para detectar uma senha embutida no argumento da função em Python*".
@@ -100,8 +101,8 @@
 
 ### Slide: Pergunta de pesquisa (~1,5 min)
 **No TCC:** Seção 1.2 "Formulação do problema" (p. 17-18).
-> "Um *framework* multi-agente baseado em LLMs é capaz de sintetizar regras para o SemGrep que detectem vulnerabilidades em código C com *recall* e precisão estatisticamente superiores aos do *ruleset* tradicional da ferramenta?" (citação direta, Seção 1.2, p. 17)
-> "O escopo restringe-se à linguagem C, a cinco categorias de CWE [...] e ao SemGrep como motor de execução das regras." (Seção 1.2, p. 18) — a lista e definição das cinco CWEs está na Seção 2.2.2.2 "*Common Weakness Enumeration*" (p. 32, referencial teórico, fora do escopo dos 15 min).
+> "Um *framework* multi-agente baseado em LLMs é capaz de sintetizar regras para o SemGrep que detectem vulnerabilidades em código C com *recall* e precisão estatisticamente superiores aos do *ruleset* tradicional da ferramenta?" (citação direta, Seção 1.2, p. 18)
+> "O escopo restringe-se à linguagem C, a cinco categorias de CWE [...] e ao SemGrep como motor de execução das regras." (Seção 1.2, p. 18) — a lista e definição das cinco CWEs está na Seção 2.2.2.2 "*Common Weakness Enumeration*" (p. 32, referencial teórico, fora do escopo dos 20 min).
 
 **Fala sugerida:**
 - Concluindo para a pergunta central do trabalho:
@@ -116,16 +117,16 @@
 *(Seção curta, incluída a pedido do autor: situa o trabalho na literatura antes dos objetivos. O detalhe de cada artigo fica na versão de consulta, no apêndice deste roteiro.)*
 
 ### Slide: Trabalhos relacionados (~1 min)
-**No TCC:** Seção 2.3 "Trabalhos correlatos" (p. 44-52): 2.3.1 KNighter (p. 45-46), 2.3.2 Hou et al. (p. 47-48), 2.3.3 RepoAudit (p. 49-51).
-> "KNighter relata dentre 37 *checkers* plausíveis, foram relatados 92 novos *bugs*, que depois de uma inspeção manual, 32,2% foram falsos positivos." (2.3.1, p. 46)
-> "Resultados de Hou et al. criaram 41 regras válidas comparadas com as 37 geradas por Yang et al." (2.3.2, p. 48)
-> "O agente [RepoAudit] [...] totalizando 40 verdadeiros positivos e 11 falsos positivos, uma precisão de 78,43%." (2.3.3, p. 50)
+**No TCC:** Seção 2.3 "Trabalhos correlatos" (p. 44-53): 2.3.1 KNighter (p. 45-47), 2.3.2 Hou et al. (p. 47-50), 2.3.3 RepoAudit (p. 50-52).
+> "Dos 37 *checkers* plausíveis, o agente de triagem classificou 90 relatórios como *bug*; após verificação manual, 61 eram verdadeiros positivos, o que corresponde a uma taxa de falsos positivos de 32,2%." (2.3.1, p. 47)
+> "Resultados de Hou et al. criaram 41 regras válidas comparadas com as 37 geradas por Yang et al." (2.3.2, p. 49)
+> "O agente [RepoAudit] [...] totalizando 40 verdadeiros positivos e 11 falsos positivos, uma precisão de 78,43%." (2.3.3, p. 51)
 
 **Fala sugerida:**
 - Três trabalhos recentes atacam o mesmo problema — as limitações da análise estática tradicional — e cada um dá um papel diferente ao LLM.
 
 - O KNighter foi o pioneiro: a partir de commits de correção, o LLM sintetiza checkers para o Clang Static Analyzer.
-    - Os 37 checkers plausíveis acharam 92 bugs novos, mas 32% desses alertas eram falsos positivos.
+    - Dos relatórios dos 37 checkers plausíveis, 32% eram falsos positivos; no total, foram 92 bugs novos no kernel do Linux.
 
 - O Hou e colegas também sintetizam regras, mas para o SemGrep — o mesmo motor que eu uso.
     - Além de gerar, eles migram e otimizam regras entre linguagens, e superaram o KNighter em regras válidas: 41 contra 37.
@@ -134,14 +135,14 @@
     - Chega a 78% de precisão, mas consulta o LLM a cada auditoria — são cerca de 2,54 dólares por projeto, e esse custo se repete toda vez.
 
 ### Slide: Trabalhos relacionados: o que este trabalho muda (~45s)
-**No TCC:** Seção 2.3.4 "Síntese comparativa" + Tabela 2 (p. 51-52); os parágrafos "Para o presente trabalho" de cada subseção (2.3.1 a 2.3.3) sustentam o contraste.
-> "KNighter utiliza somente *commits* para seu treinamento [...] este trabalho recorre ao *dataset* de [Juliet]." (2.3.1, p. 45-46)
-> "o RepoAudit consulta o modelo a cada auditoria, de modo que o custo se repete a cada execução [...], enquanto este trabalho utiliza a LLM apenas para gerar regras, que depois são executadas pelo SemGrep sem custo de inferência." (2.3.3, p. 49-51)
+**No TCC:** Seção 2.3.4 "Síntese comparativa" + Tabela 2 (p. 52-53); os parágrafos "Para o presente trabalho" de cada subseção (2.3.1 a 2.3.3) sustentam o contraste.
+> "KNighter utiliza somente *commits* para seu treinamento [...] este trabalho recorre ao *dataset* de [Juliet]." (2.3.1, p. 47)
+> "o RepoAudit consulta o modelo a cada auditoria, de modo que o custo se repete a cada execução [...], enquanto este trabalho utiliza a LLM apenas para gerar regras, que depois são executadas pelo SemGrep sem custo de inferência." (2.3.3, p. 51-52)
 
 **Fala sugerida:**
 - Na tabela, o que importa é o papel do LLM e a limitação que cada trabalho declara.
     - O KNighter fica preso ao ecossistema C/C++ e erra em lógica de estado complexa.
-    - O Hou e colegas ainda têm muitos falsos positivos e dificuldade com fluxo de dados.
+    - O Hou e colegas dependem da capacidade do LLM, têm uma amostra de verificação limitada e exigem intervenção humana a cada iteração.
     - E o RepoAudit tem custo a cada auditoria e alcance limitado a cadeias de quatro funções.
 
 - No meu trabalho, o LLM gera e corrige a regra, usando exemplos do Juliet em vez de histórico de commits — o KNighter só aprende de commits, o que limita o que ele consegue detectar.
@@ -158,7 +159,7 @@
 **No TCC:** Seção 1.3 "Objetivos e hipótese" (p. 18-21): Subseção 1.3.1 "Objetivo geral" (p. 18), Subseção 1.3.2 "Objetivos específicos" (p. 19), Subseção 1.3.3 "Hipótese ou critério de validação" (p. 20).
 > "O objetivo geral deste trabalho é demonstrar que um *framework* de síntese automatizada de regras [...] apresenta precisão e *recall* estatisticamente superiores às abordagens estáticas tradicionais [...] em, no mínimo, cinco categorias de [CWE]." (1.3.1, p. 18)
 > "(1) Determinar os limites de detecção semântica [...]; (2) Avaliar o ganho quantitativo de desempenho [...]; (3) Determinar a viabilidade técnica [...] utilizando modelos de linguagem de menor escala." (1.3.2, p. 19)
-> "A hipótese desta pesquisa é a de que a geração automatizada de regras [...] produzirá taxas de detecção [...] estatisticamente superiores [...] quando comparada aos conjuntos de regras predefinidos." (1.3.3, p. 20)
+> "A hipótese desta pesquisa é a de que a geração automatizada de regras [...] produzirá taxas de detecção [...] estatisticamente superiores [...] quando comparada aos conjuntos de regras predefinidos." (1.3.3, p. 20-18)
 
 **Fala sugerida:**
 - Nosso objetivo geral:
@@ -170,12 +171,12 @@
 - A hipótese sendo que o modelo automatizado detecta vulnerabilidades com taxas estatisticamente superiores às abordagens tradicionais. 
 
 ### Slide: Arquitetura implementada (~1 min) — slide em tópicos
-**No TCC:** Seção 3.2.3 "Arquitetura efetivamente implementada" (p. 55-56) e Seção 3.2.7 "Protocolo de avaliação" (p. 59).
-> "O sistema implementado estrutura-se em dois papéis centrais executados por modelos de linguagem -- gerador e corretor -- e um componente determinístico, o *gate* de avaliação." (3.2.3, p. 55)
-> "Uma regra é considerada **aprovada** quando [...] atinge *recall* mínimo de 50%, não produz nenhum falso positivo nos casos sintéticos do Juliet Test Suite e não ultrapassa 0,1 alertas por mil linhas de código (KLOC)." (3.2.3, p. 56)
-> "A avaliação de cada regra sintetizada segue um protocolo de validação cruzada por dobras [...] com $k=5$ [...] cada configuração experimental foi repetida com múltiplas sementes [...] nas configurações consideradas mais relevantes, estendidas a cinco." (3.2.7, p. 59)
-> "O teto de seis tentativas é um ajuste empírico, não o resultado de uma comparação dedicada entre diferentes valores de teto [...] Mesmo dentro desse novo orçamento, o mesmo comportamento de repetição persistiu em boa parte das execuções registradas -- em algumas configurações, o corretor reenviou a regra da tentativa anterior em até cinco das seis correções disponíveis." (3.2.3, p. 56, trecho adicionado nesta revisão)
-> "em vez de reescrever a regra inteira a cada tentativa de correção, o corretor responde apenas com o novo valor de um único campo [...], escolhido ciclicamente a cada tentativa, enquanto o restante da regra permanece inalterado." (3.2.4 "Formatos de saída das regras", p. 57)
+**No TCC:** Seção 3.2.3 "Arquitetura efetivamente implementada" (p. 57-58) e Seção 3.2.7 "Protocolo de avaliação" (p. 61-62).
+> "O sistema implementado estrutura-se em dois papéis centrais executados por modelos de linguagem -- gerador e corretor -- e um componente determinístico, o *gate* de avaliação." (3.2.3, p. 57)
+> "Uma regra é considerada **aprovada** quando [...] atinge *recall* mínimo de 50%, não produz nenhum falso positivo nos casos sintéticos do Juliet Test Suite e não ultrapassa 0,1 alertas por mil linhas de código (KLOC)." (3.2.3, p. 58)
+> "A avaliação de cada regra sintetizada segue um protocolo de validação cruzada por dobras [...] com $k=5$ [...] cada configuração experimental foi repetida com múltiplas sementes [...] nas configurações consideradas mais relevantes, estendidas a cinco." (3.2.7, p. 61)
+> "O teto de seis tentativas é um ajuste empírico, não o resultado de uma comparação dedicada entre diferentes valores de teto [...] Mesmo dentro desse novo orçamento, o mesmo comportamento de repetição persistiu em boa parte das execuções registradas -- em algumas configurações, o corretor reenviou a regra da tentativa anterior em até cinco das seis correções disponíveis." (3.2.3, p. 57, trecho adicionado nesta revisão)
+> "em vez de reescrever a regra inteira a cada tentativa de correção, o corretor responde apenas com o novo valor de um único campo [...], escolhido ciclicamente a cada tentativa, enquanto o restante da regra permanece inalterado." (3.2.4 "Formatos de saída das regras", p. 59)
 
 **Fala sugerida:**
 - A arquitetura implementada é mais simplificada do que a antiga: dois papéis de LLM, o Gerador e o Corretor, e um componente determinístico no meio, o Gate.
@@ -197,7 +198,7 @@
     - Trocar a semente refaz esse sorteio do zero; numa mesma semente, as 5 dobras só se revezam sendo teste, sem novo sorteio.
 
 ### Slide: Arquitetura implementada: fluxo (~0,5 min) — slide só com o diagrama
-**No TCC:** Seção 3.2.3 "Arquitetura efetivamente implementada" (p. 55-56).
+**No TCC:** Seção 3.2.3 "Arquitetura efetivamente implementada" (p. 57-58).
 
 **Fala sugerida:**
 - Visualmente, o fluxo é este:
@@ -214,9 +215,9 @@
 *(Este é o bloco mais longo — é aqui que está a evidência do trabalho. Fale devagar, deixe os números "assentarem".)*
 
 ### Slide: Antes dos números: formato e combinação de modelo (~30s)
-**No TCC:** Seção 3.2.4 "Formatos de saída das regras" (p. 57) + Seção 3.2.6 "Combinações de modelos avaliadas" (p. 58-59).
-> "cinco formatos distintos de saída foram implementados e avaliados para a regra candidata, cada um restringindo de forma diferente a liberdade do modelo gerador." (3.2.4, p. 57)
-> "a combinação D [...] demonstrou-se necessária para a obtenção dos melhores resultados [...]; a combinação C, baseada em um modelo de 4 bilhões de parâmetros, não foi capaz de reproduzir os ganhos obtidos pelo mecanismo `field_correct`." (3.2.6, p. 59)
+**No TCC:** Seção 3.2.4 "Formatos de saída das regras" (p. 58-59) + Seção 3.2.6 "Combinações de modelos avaliadas" (p. 60-61).
+> "cinco formatos distintos de saída foram implementados e avaliados para a regra candidata, cada um restringindo de forma diferente a liberdade do modelo gerador." (3.2.4, p. 58)
+> "a combinação D [...] demonstrou-se necessária para a obtenção dos melhores resultados [...]; a combinação C, baseada em um modelo de 4 bilhões de parâmetros, não foi capaz de reproduzir os ganhos obtidos pelo mecanismo `field_correct`." (3.2.6, p. 61)
 
 **Fala sugerida:**
 - Formato de saída é o quanto de liberdade eu dou para o modelo escrever a regra.
@@ -225,10 +226,10 @@
 - Combo é a combinação de modelo: qual LLM eu usei como gerador e corretor. 
 
 ### Slide: Nossas combinações de modelo (~40s)
-**No TCC:** Seção 3.2.6 "Combinações de modelos avaliadas" (p. 58-59) + Tabela 3 "*Combinações de modelos de linguagem avaliadas*" (p. 58).
-> "Todas as combinações utilizam o mesmo modelo de 3 bilhões de parâmetros (Qwen2.5-Coder-3B) na etapa de detecção inicial de vulnerabilidades, variando o modelo responsável pela geração e correção das regras." (3.2.6, p. 58)
-> "A: Qwen2.5-Coder-3B em todos os papéis. B: Qwen2.5-Coder-7B. C: Qwen3-4B-Instruct-2507. D: Qwen3-Coder-30B-A3B (*Mixture-of-Experts*, aproximadamente 3 bilhões de parâmetros ativos por *token*). E: Qwen3-Coder-30B-A3B, sem troca de modelos entre papéis." (Tabela 3, p. 58 -- o TCC também avalia um combo F com Phi-4-mini, omitido no slide por não ser comentado na fala)
-> "a combinação D [...] demonstrou-se necessária para a obtenção dos melhores resultados [...]; a combinação C [...] não foi capaz de reproduzir os ganhos obtidos pelo mecanismo `field_correct`, evidenciando uma relação direta entre a capacidade do modelo gerador e a eficácia de mecanismos de correção mais refinados." (3.2.6, p. 59)
+**No TCC:** Seção 3.2.6 "Combinações de modelos avaliadas" (p. 60-61) + Tabela 3 "*Combinações de modelos de linguagem avaliadas*" (p. 61).
+> "Todas as combinações utilizam o mesmo modelo de 3 bilhões de parâmetros (Qwen2.5-Coder-3B) na etapa de detecção inicial de vulnerabilidades, variando o modelo responsável pela geração e correção das regras." (3.2.6, p. 60)
+> "A: Qwen2.5-Coder-3B em todos os papéis. B: Qwen2.5-Coder-7B. C: Qwen3-4B-Instruct-2507. D: Qwen3-Coder-30B-A3B (*Mixture-of-Experts*, aproximadamente 3 bilhões de parâmetros ativos por *token*). E: Qwen3-Coder-30B-A3B, sem troca de modelos entre papéis. F: Phi-4-mini." (Tabela 3, p. 61)
+> "a combinação D [...] demonstrou-se necessária para a obtenção dos melhores resultados [...]; a combinação C [...] não foi capaz de reproduzir os ganhos obtidos pelo mecanismo `field_correct`, evidenciando uma relação direta entre a capacidade do modelo gerador e a eficácia de mecanismos de correção mais refinados." (3.2.6, p. 61)
 
 **Fala sugerida:**
 - Essa é a tabela completa das combinações.
@@ -247,12 +248,14 @@
 
 - O Combo E é o mesmo modelo do D, mas sem trocar de modelo entre os papéis de gerador e corretor.
 
+- O Combo F troca a família: é o Phi-4-mini, de 3,8 bilhões de parâmetros, em todos os papéis — serve para testar se os resultados dependem só da família Qwen.
+
 - O Combo D foi necessário para os melhores resultados — o Combo C, de 4 bilhões, não conseguiu aproveitar o mecanismo de correção mais refinado, o field_correct.
 
 ### Slide: Modo de exemplos: findings (padrão) (~30s)
-**No TCC:** Seção 3.2.3 "Arquitetura efetivamente implementada" (p. 57) + Seção 3.2.5 "O analisador de grafos de eventos" (p. 58).
-> "o parâmetro de modo de exemplos (`example_mode`), que determina o que é mostrado ao gerador -- os achados do detector (`findings`, padrão), pares de código vulnerável/seguro do *dataset* (`pairs`), achados da análise de grafos de eventos (`graph`) ou nenhum exemplo (`none`)." (3.2.3, p. 57)
-> "testar se seus achados [...] constituiriam exemplos de treinamento de maior qualidade para o gerador do que os achados, predominantemente textuais, do detector inicial de 3 bilhões de parâmetros." (3.2.5, p. 58)
+**No TCC:** Seção 3.2.3 "Arquitetura efetivamente implementada" (p. 58) + Seção 3.2.5 "O analisador de grafos de eventos" (p. 59-60).
+> "o parâmetro de modo de exemplos (`example_mode`), que determina o que é mostrado ao gerador -- os achados do detector (`findings`, padrão), pares de código vulnerável/seguro do *dataset* (`pairs`), achados da análise de grafos de eventos (`graph`) ou nenhum exemplo (`none`)." (3.2.3, p. 58)
+> "testar se seus achados [...] constituiriam exemplos de treinamento de maior qualidade para o gerador do que os achados, predominantemente textuais, do detector inicial de 3 bilhões de parâmetros." (3.2.5, p. 60)
 
 **Fala sugerida:**
 - O modo de exemplos define o que eu mostro para o gerador antes de pedir a regra, tem quatro valores: findings, pairs, graph e none.
@@ -264,8 +267,8 @@
 - O problema é que essa descrição é só texto, não aponta as linhas exatas do código envolvidas.
 
 ### Slide: Modo de exemplos: pairs (~30s)
-**No TCC:** Seção 3.3.3 "Revisão da configuração de referência e rodada final (CWE-416)" (p. 62).
-> "a única configuração já aprovada pelo *gate* ao longo de todo o trabalho: a combinação D, formato `template`, com o parâmetro `example_mode=pairs` (pares de código vulnerável e seguro apresentados ao gerador, em vez dos achados do detector), aplicada ao CWE-416." (Seção 3.3.3, p. 62)
+**No TCC:** Seção 3.3.3 "Revisão da configuração de referência e rodada final (CWE-416)" (p. 64).
+> "a única configuração já aprovada pelo *gate* ao longo de todo o trabalho: a combinação D, formato `template`, com o parâmetro `example_mode=pairs` (pares de código vulnerável e seguro apresentados ao gerador, em vez dos achados do detector), aplicada ao CWE-416." (Seção 3.3.3, p. 64)
 
 **Fala sugerida:**
 - Em pairs, o gerador recebe, lado a lado, o próprio par de código do Juliet: a versão vulnerável e a versão corrigida do mesmo trecho.
@@ -275,10 +278,10 @@
 - A vantagem sobre o findings é mostrar para o modelo não só onde está o defeito, mas o que diferencia o código com bug do código seguro.
 
 ### Slide: Modo de exemplos: graph (~45s)
-**No TCC:** Seção 3.2.5 "O analisador de grafos de eventos" (p. 57-58) + Seção 3.4.5 "O que não foi alcançado", item (v) (p. 69) + Tabela "*Efeito de* `example_mode=graph`" (p. 69).
-> "o modo de exemplos `graph` [...] é alimentado por um componente [...] que não utiliza nenhum modelo de linguagem: um analisador de grafos de eventos de memória." (3.2.5, p. 57)
-> "Substituir os achados do detector inicial pelos achados do analisador de grafos como exemplo de treinamento (`example_mode=graph`) elevou o *recall* da combinação D no CWE-416 de 71,6% para 91,6%, porém às custas de uma queda de precisão de 89,4% para 69,8% [...]: a regra tornou-se mais abrangente, não mais silenciosa." (3.4.5, item v, p. 69)
-> "a descrição de um achado do grafo [...] informa ao modelo onde está o defeito, mas não o que a regra deve excluir." (3.4.5, item v, p. 69)
+**No TCC:** Seção 3.2.5 "O analisador de grafos de eventos" (p. 59-60) + Seção 3.4.5 "O que não foi alcançado", item (v) (p. 71-72) + Tabela "*Efeito de* `example_mode=graph`" (p. 72).
+> "o modo de exemplos `graph` [...] é alimentado por um componente [...] que não utiliza nenhum modelo de linguagem: um analisador de grafos de eventos de memória." (3.2.5, p. 58-59)
+> "Substituir os achados do detector inicial pelos achados do analisador de grafos como exemplo de treinamento (`example_mode=graph`) elevou o *recall* da combinação D no CWE-416 de 71,6% para 91,6%, porém às custas de uma queda de precisão de 89,4% para 69,8% [...]: a regra tornou-se mais abrangente, não mais silenciosa." (3.4.5, item v, p. 71)
+> "a descrição de um achado do grafo [...] informa ao modelo onde está o defeito, mas não o que a regra deve excluir." (3.4.5, item v, p. 72)
 
 **Fala sugerida:**
 - graph vem de um componente à parte que construímos, sem nenhum LLM: o analisador de grafos de eventos de memória, que aponta as duas linhas exatas do defeito — a liberação e o uso.
@@ -292,8 +295,8 @@
 - Identificando o limite da linguagem YAML para criar uma regra complexa o suficiente de identificar devidamente.
 
 ### Slide: Mecanismos do corretor: guard e project_apis (~30s)
-**No TCC:** Seção 3.2.3 "Arquitetura efetivamente implementada" (p. 57).
-> "o *guard*, que impede que uma correção substitua a melhor regra já encontrada caso a nova versão apresente pontuação inferior; o `project_apis`, que insere no *prompt* os nomes das funções de memória próprias do projeto-alvo." (3.2.3, p. 57)
+**No TCC:** Seção 3.2.3 "Arquitetura efetivamente implementada" (p. 58).
+> "o *guard*, que impede que uma correção substitua a melhor regra já encontrada caso a nova versão apresente pontuação inferior; o `project_apis`, que insere no *prompt* os nomes das funções de memória próprias do projeto-alvo." (3.2.3, p. 58)
 
 **Fala sugerida:**
 - Dois mecanismos do corretor, fora do modo de exemplos: guard nunca deixa ele trocar a melhor regra já encontrada por uma pior.
@@ -302,26 +305,39 @@
 
 - Juntos, eles elevaram o recall do CWE-416 — mas à custa de um salto de ruído.
 
-### Slide: Síntese dos resultados por CWE (~1,5 min)
-**No TCC:** Seção 3.4 "Resultados e análises", abertura (p. 62) + Tabela 4 "*Síntese dos melhores resultados por CWE*" (p. 62).
-> "A Tabela [4] sintetiza o melhor resultado obtido para cada categoria de vulnerabilidade avaliada ao longo do trabalho." (3.4, p. 62)
+### Slide: Síntese dos resultados por CWE: leitura (~1 min) — tópicos
+**No TCC:** legenda da Tabela 4 (p. 65) + critério de aprovação na Seção 3.2.3 (p. 58).
+
+**Fala sugerida:**
+- Olhando o resultado geral: só o CWE-416, uso após liberação, teve dobras efetivamente aprovadas pelo Gate.
+    - Em duas das cinco sementes, e de forma instável.
+
+- O CWE-415, double free, chegou perto, com recall relevante, mas nunca foi aprovado.
+
+- Um detalhe importante sobre o recall que aparece na tabela: ele é a média das cinco dobras de cada semente, não o recall da dobra que de fato passou no Gate. A dobra aprovada do CWE-416 teve recall de 57% — bem mais baixo, mas com ruído baixo o suficiente pra aprovar.
+
+- E lembrando que aprovar exige também no máximo 0,1 alertas por KLOC no git/git — esse critério só filtra ruído, não mede recall.
+
+### Slide: Síntese dos resultados por CWE (~0,5 min) — tabela
+**No TCC:** Seção 3.4 "Resultados e análises", abertura (p. 64) + Tabela 4 "*Síntese dos melhores resultados por CWE*" (p. 65).
+> "A Tabela [4] sintetiza o melhor resultado obtido para cada categoria de vulnerabilidade avaliada ao longo do trabalho." (3.4, p. 64)
 
 **Fala sugerida:**
 - Melhor resultado obtido em cada uma das cinco categorias.
 
-- Olhando rápido: o CWE-416, uso após liberação, foi o único que teve dobras efetivamente aprovadas pelo Gate.
-    - Só em duas das cinco sementes. 
-    - E um detalhe importante: esse recall de até 100% na tabela é a média das cinco dobras de cada semente, não o recall da dobra que de fato passou no Gate. A dobra aprovada teve recall de 57% — bem mais baixo, mas com ruído baixo o suficiente pra aprovar.
+- O CWE-416 está no topo, com recall de 89 a 100% e aprovação em duas de cinco sementes.
 
-- O CWE-415, double free, chegou perto, com recall relevante, mas nunca foi aprovado. 
+- O CWE-415 tem recall relevante, de 43 a 76%, mas zero de cinco sementes aprovadas.
 
-- E as outras três — 401, 476 e 457 — ficaram com desempenho insuficiente.
+- O CWE-401 aparece com 79%, mas é uma execução isolada, com um modelo remoto e sem validação cruzada, e que reprovou no critério de zero falsos positivos do Juliet — por isso não há aprovação a reportar.
+
+- O CWE-476 e o CWE-457 ficaram com recall baixo, de cerca de 23 a 25% e de até 5%, respectivamente.
 
 ### Slide: CWE-416: evolução até a melhor configuração (~1,5 min)
-**No TCC:** Seção 3.4.3 "CWE-416: da aprovação isolada à melhoria consistente" (p. 63-65) + Tabela 5 "*Evolução da configuração de referência para o CWE-416*" (p. 64) + Figura 12 (placeholder, p. 64) + item (iii) da Seção 3.4.5 "O que não foi alcançado" (p. 67), que relata a combinação `pairs+guard+project_apis`.
-> "A combinação do parâmetro `pairs` com os mecanismos `guard` e `project_apis` elevou ainda mais o *recall* [...] porém às custas de um aumento severo de ruído (619 a 799 falsos positivos [...])." (3.4.3, p. 64)
-> "Isolando apenas o mecanismo `guard` (sem o `project_apis`) [...] obteve-se o melhor resultado do trabalho [...] com uma faixa de *recall* mais concentrada (89,2% a 100%)." (3.4.3, p. 64-65)
-> "O resultado mostrou o oposto: a taxa de falsos positivos aumentou em uma ordem de grandeza [...] o isolamento posterior do `project_apis` como variável causadora só foi possível por meio de uma rodada adicional." (3.4.5, item iii, p. 67)
+**No TCC:** Seção 3.4.3 "CWE-416: da aprovação isolada à melhoria consistente" (p. 66-68) + Tabela 5 "*Evolução da configuração de referência para o CWE-416*" (p. 67) + Figura 13 (placeholder, p. 67) + item (iii) da Seção 3.4.5 "O que não foi alcançado" (p. 70-71), que relata a combinação `pairs+guard+project_apis`.
+> "A combinação do parâmetro `pairs` com os mecanismos `guard` e `project_apis` elevou ainda mais o *recall* [...] porém às custas de um aumento severo de ruído (619 a 799 falsos positivos [...])." (3.4.3, p. 67)
+> "Isolando apenas o mecanismo `guard` (sem o `project_apis`) [...] obteve-se o melhor resultado do trabalho [...] com uma faixa de *recall* mais concentrada (89,2% a 100%)." (3.4.3, p. 67)
+> "O resultado mostrou o oposto: a taxa de falsos positivos aumentou em uma ordem de grandeza [...] o isolamento posterior do `project_apis` como variável causadora só foi possível por meio de uma rodada adicional." (3.4.5, item iii, p. 70-71)
 
 **Fala sugerida:**
 - Começamos com a configuração `pairs`, que já superava a regra tradicional, mas ainda tinha de 84 a 320 falsos positivos.
@@ -335,28 +351,30 @@
 *(Se já tiver o gráfico no lugar do placeholder: 'o gráfico mostra bem esse salto e a queda depois'.)*"
 
 ### Slide: CWE-415: a lição metodológica das sementes (~1,5 min)
-**No TCC:** Seção 3.4.4 "CWE-415 e a necessidade metodológica de múltiplas sementes" (p. 65-66) + Tabela 6 "*Recall por semente de particionamento [...] CWE-415*" (p. 65) + Figura 13 (placeholder, p. 66).
-> "suas duas sementes originais apresentaram *recall* de 63,8% e 64,8% [...] que, isoladamente, sugeririam um resultado estável em torno de 64%. A extensão para cinco sementes revelou uma realidade distinta: 63,8%, 64,8%, 47,3%, 43,3% e 76,3%, uma amplitude de 33 pontos percentuais." (3.4.4, p. 65)
-> "a variação de resultado entre sementes de particionamento foi, em diversos casos, maior do que o efeito de qualquer mecanismo experimental avaliado." (3.4.4, p. 66)
+**No TCC:** Seção 3.4.4 "CWE-415 e a necessidade metodológica de múltiplas sementes" (p. 68-69) + Tabela 6 "*Recall por semente de particionamento [...] CWE-415*" (p. 68) + Figura 14 (placeholder, p. 69).
+> "suas duas sementes originais apresentaram *recall* de 63,8% e 64,8% [...] que, isoladamente, sugeririam um resultado estável em torno de 64%. A extensão para cinco sementes revelou uma realidade distinta: 63,8%, 64,8%, 47,3%, 43,3% e 76,3%, uma amplitude de 33 pontos percentuais." (3.4.4, p. 68)
+> "a variação de resultado entre sementes de particionamento foi, em diversos casos, maior do que o efeito de qualquer mecanismo experimental avaliado." (3.4.4, p. 69)
 
-**No slide:** tabela com as 5 sementes e seus recalls; 3 bullets (amplitude de 33 p.p.; nunca aprovada pelo gate; lição metodológica); aviso de gráfico pendente.
+**No slide:** tabela com as 5 sementes e seus recalls; 4 bullets (variação instável; 63,8% e 64,8% nas duas primeiras sementes; lição metodológica; nunca aprovada pelo gate).
 
 **Fala sugerida:**
 - Na configuração de referência do CWE-415, as duas primeiras sementes que testei deram recall de 63,8% e 64,8% — valores bem próximos, que sugeririam um resultado estável.
     - Quando estendi para cinco sementes, apareceram também 47,3%, 43,3% e 76,3%. 
     - Sendo muito instável.
 
+- A lição é metodológica: a variação entre sementes pode exceder o efeito de qualquer mecanismo que testei — por isso estendi as configurações relevantes para cinco sementes.
+
 - Quase foi passado despercebido sua instabilidade.
     - A regra nunca foi aprovada pelo Gate — porque recall alto e baixo ruído em código real nunca aconteceram juntos, na mesma semente.
 
 ### Slide: CWE-416: a regra sintetizada supera a tradicional (~2 min — slide mais importante)
-**No TCC:** Seção 3.4.6 "Comparação com um analisador estático tradicional" (p. 71-73) + Tabela 9 "*Comparação entre as regras sintetizadas e um analisador tradicional*" (p. 72) + Figura 14 (placeholder, p. 72). O slide mostra só o CWE-416; a Tabela 9 do TCC traz também o CWE-415.
-> "O registro público [...] do SemGrep [...] disponibiliza o pacote `r/c` [...] duas regras mostraram-se diretamente relevantes [...]: `c.lang.security.function-use-after-free`, para o CWE-416, e `c.lang.security.double-free` [...] para o CWE-415." (3.4.6, p. 71)
-> "a melhor configuração sintetizada por este trabalho superou a regra tradicional em *recall* em todas as cinco sementes avaliadas, sem exceção." (3.4.6, p. 72)
-> "a precisão [...] apresenta um quadro mais equilibrado [...] evidenciando que o ganho de *recall* [...] não ocorre sem nenhum custo de precisão, ainda que o ganho líquido, medido pelo F1-Score, seja favorável em todas as sementes avaliadas." (3.4.6, p. 73)
+**No TCC:** Seção 3.4.6 "Comparação com um analisador estático tradicional" (p. 74-76) + Tabela 9 "*Comparação entre as regras sintetizadas e um analisador tradicional*" (p. 75) + Figura 15 (placeholder, p. 75). O slide mostra só o CWE-416; a Tabela 9 do TCC traz também o CWE-415.
+> "O registro público [...] do SemGrep [...] disponibiliza o pacote `r/c` [...] duas regras mostraram-se diretamente relevantes [...]: `c.lang.security.function-use-after-free`, para o CWE-416, e `c.lang.security.double-free` [...] para o CWE-415." (3.4.6, p. 74)
+> "a melhor configuração sintetizada por este trabalho superou a regra tradicional em *recall* em todas as cinco sementes avaliadas, sem exceção." (3.4.6, p. 76)
+> "a precisão [...] apresenta um quadro mais equilibrado [...] evidenciando que o ganho de *recall* [...] não ocorre sem nenhum custo de precisão, ainda que o ganho líquido, medido pelo F1-Score, seja favorável em todas as sementes avaliadas." (3.4.6, p. 76)
 
 **Fala sugerida:**
-- Dos cinco CWEs, só o CWE-416 teve aprovação consistente do Gate — é com ele que faço a comparação.
+- Dos cinco CWEs, só o CWE-416 teve dobras aprovadas pelo Gate, em duas das cinco sementes e de forma instável — é com ele que faço a comparação.
 
 - O registro público e gratuito do SemGrep tem uma regra relevante para esse CWE, a `function-use-after-free`.
 
@@ -371,14 +389,14 @@
 *(Pausa curta aqui. É o número que a banca vai lembrar.)*"
 
 ### Slide: O que não funcionou — um limite da linguagem, não da busca (~1,5 min)
-**No TCC:** Seção 3.4.1 "CWE-457: um alvo estruturalmente inadequado" (p. 62-63, para o ponto do CWE-457) + Seção 3.4.5 "O que não foi alcançado", item (vi) (p. 68-69, para o diagnóstico CWE-401/415/476) + Tabela 7 (p. 68) e Tabela 8 (p. 70), que sustentam os experimentos finais citados no item (vi).
-> "o teto de *recall* de aproximadamente 31% obtido manualmente [...] já está abaixo do limiar mínimo de 50% exigido pelo *gate*." (3.4.1, p. 63)
-> "**CWE-401** [...] é um argumento de vivacidade (*liveness*) sobre todos os caminhos até todas as saídas da função, não uma relação entre dois pontos fixos de código [...] que uma regra de *taint* possa nomear." (3.4.5, item vi, p. 68)
-> "**CWE-415** [...] a fonte e o sumidouro de contaminação são [...] exatamente o mesmo padrão sintático (`free($P)`); o motor de *taint* do SemGrep casa essa única ocorrência contra si mesma." (3.4.5, item vi, p. 68-69)
-> "**CWE-476** [...] a ausência de um teste não nulo em qualquer caminho [...] é uma condição sobre caminhos de fluxo de controle, não uma forma sintática única que possa ser nomeada e excluída de uma vez." (3.4.5, item vi, p. 69)
-> "O fato de essas três causas se manterem idênticas através de métodos tão distintos quanto um modelo de 30 bilhões de parâmetros [...] um gerador determinístico por síntese de padrões e um programa que compila a lógica do grafo diretamente em uma regra fixa [...] é [...] a evidência mais forte [...] de que o limite não está na busca, mas no destino dela." (3.4.5, item vi, p. 69)
+**No TCC:** Seção 3.4.1 "CWE-457: um alvo estruturalmente inadequado" (p. 64-65, para o ponto do CWE-457) + Seção 3.4.5 "O que não foi alcançado", item (vi) (p. 73-74, para o diagnóstico CWE-401/415/476) + Tabela 7 (p. 72) e Tabela 8 (p. 73), que sustentam os experimentos finais citados no item (vi).
+> "o teto de *recall* de aproximadamente 31% obtido manualmente [...] já está abaixo do limiar mínimo de 50% exigido pelo *gate*." (3.4.1, p. 65)
+> "**CWE-401** [...] é um argumento de vivacidade (*liveness*) sobre todos os caminhos até todas as saídas da função, não uma relação entre dois pontos fixos de código [...] que uma regra de *taint* possa nomear." (3.4.5, item vi, p. 73)
+> "**CWE-415** [...] a fonte e o sumidouro de contaminação são [...] exatamente o mesmo padrão sintático (`free($P)`); o motor de *taint* do SemGrep casa essa única ocorrência contra si mesma." (3.4.5, item vi, p. 74)
+> "**CWE-476** [...] a ausência de um teste não nulo em qualquer caminho [...] é uma condição sobre caminhos de fluxo de controle, não uma forma sintática única que possa ser nomeada e excluída de uma vez." (3.4.5, item vi, p. 74)
+> "O fato de essas três causas se manterem idênticas através de métodos tão distintos quanto um modelo de 30 bilhões de parâmetros [...] um gerador determinístico por síntese de padrões e um programa que compila a lógica do grafo diretamente em uma regra fixa [...] é [...] a evidência mais forte [...] de que o limite não está na busca, mas no destino dela." (3.4.5, item vi, p. 74)
 
-**No slide:** 4 bullets (um por CWE sem solução: 457, 401, 415, 476) + 1 linha de fechamento sobre os três métodos de confirmação.
+**No slide:** 4 bullets (um por CWE sem solução: 457, 401, 415, 476); a confirmação pelos três métodos fica só na fala.
 
 **Fala sugerida:**
 - As outras três categorias não funcionaram, e investigando a fundo o porquê:
@@ -414,12 +432,13 @@
 ## 6. Conclusão
 
 ### Slide: Conclusão (~1,5 min)
-**No TCC:** Seção 4.1 "Retomada do problema e dos objetivos" (p. 74) + Seção 4.2 "Contribuições para a Computação" (p. 75) + Seção 4.3 "Limitações e trabalhos futuros" (p. 76).
-> "A resposta obtida é condicional, não categórica: sim, para duas das cinco categorias de CWE [...] (CWE-416 e CWE-415) [...]; não demonstrada, para as demais três." (4.1, p. 74)
-> "Dos três Objetivos Específicos [...] o primeiro [...] e o terceiro [...] foram plenamente alcançados; o segundo [...] foi parcialmente alcançado." (4.1, p. 74)
-> "Contribui-se ainda com um diagnóstico que distingue [...] um limite de **busca** de um limite de **linguagem-alvo**." (4.2, p. 75)
-> "uma regra pode satisfazer integralmente um critério de aprovação quantitativo [...] sem que seus alertas individuais correspondam a defeitos verdadeiros quando lidos manualmente [...] o que reforça [...] a necessidade de revisão manual amostral." (4.2, p. 75)
-> "propõe-se: (i) validar as configurações já aprovadas sobre múltiplos repositórios de negativos do mundo real [...]; [...] (vi) [...] investigar um motor de análise estática com sensibilidade a caminho [...] (como o CodeQL ou o Joern)." (4.3, p. 76)
+**No TCC:** Seção 4.1 "Retomada do problema e dos objetivos" (p. 77) + Seção 4.2 "Contribuições para a Computação" (p. 78-79) + Seção 4.3 "Limitações e trabalhos futuros" (p. 79-81).
+> "A resposta obtida é condicional, não categórica: sim, para o CWE-416, único em que alguma dobra foi aprovada pelo *gate* [...]; apenas em parte, para o CWE-415, [...] cuja melhor configuração nunca satisfez simultaneamente os critérios de aprovação do *gate* [...]; não demonstrada, para as demais três." (4.1, p. 77)
+> "Dos três Objetivos Específicos [...] o primeiro [...] e o terceiro [...] foram plenamente alcançados; o segundo [...] foi parcialmente alcançado." (4.1, p. 77)
+> "Contribui-se ainda com um diagnóstico que distingue [...] um limite de **busca** de um limite de **linguagem-alvo**." (4.2, p. 79)
+> "uma regra pode satisfazer integralmente um critério de aprovação quantitativo [...] sem que seus alertas individuais correspondam a defeitos verdadeiros quando lidos manualmente [...] o que reforça [...] a necessidade de revisão manual amostral." (4.2, p. 79)
+> "propõe-se: (i) validar as configurações já aprovadas sobre múltiplos repositórios de negativos do mundo real [...]; [...] (vi) [...] investigar um motor de análise estática com sensibilidade a caminho [...] (como o CodeQL ou o Joern)." (4.3, p. 80-81)
+> "(vii) Ampliar as medições de diagnóstico, para compreender melhor o problema e as diferenças entre os casos, e não apenas aprimorar a escrita das regras [...]" (4.3, p. 81)
 
 **No slide:** 7 bullets — hipótese parcialmente confirmada; não refutada no CWE-416; objetivos 1/3 alcançados; objetivo 2 parcial; contribuição central (busca × linguagem-alvo); achado complementar (gate ≠ verdade); próximos passos.
 
@@ -436,8 +455,9 @@
 
 - Um achado também é que a aprovação pelo Gate não é garantia de que os alertas são verdadeiros em código real, e reforça que revisão manual continua sendo necessária.
 
-- Como próximos passos, os dois mais concretos são: 
+- Como próximos passos, os três mais concretos são: 
     - Em todo o trabalho, código real já entrou na avaliação — o git/git foi o gate de negativos em toda rodada, é ele que decide se uma regra passa ou não no critério de ruído. Só que é um projeto só. Então o próximo passo não é "testar em código real pela primeira vez", é confirmar que essa taxa baixa de falso positivo se mantém em outros repositórios, e não é uma peculiaridade do git/git.
+    - Ampliar as medições de diagnóstico, não só a escrita da regra: ver qual critério do Gate falha em cada CWE e dobra, comparar a cobertura por variante entre o LLM, os geradores determinísticos e a regra tradicional, e classificar por causa os alertas do git/git.
     - E explorar motores com sensibilidade a caminho, como CodeQL ou Joern, para os três CWEs que a linguagem do SemGrep não consegue expressar.
 
 - Obrigado.
@@ -450,36 +470,36 @@
 
 ## Apêndice — só usar se a banca perguntar (sem tempo fixo)
 
-Estes quatro slides não entram nos 15 minutos. Use-os como referência rápida para responder; não precisa decorar um discurso, só saber onde cada número está.
+Estas quatro entradas não são slides da apresentação principal (os slides de apêndice foram removidos do .tex): servem só como consulta rápida para a arguição; não precisa decorar um discurso, só saber onde cada número está.
 
 ### Trabalhos correlatos
 *(O resumo agora está no corpo da apresentação, seção 3; esta é a versão de consulta, com as citações do TCC.)*
-**No TCC:** Seção 2.3 "Trabalhos correlatos" (p. 44-52): 2.3.1 KNighter (p. 45-46), 2.3.2 Hou et al. (p. 47-48), 2.3.3 RepoAudit (p. 49-51), 2.3.4 "Síntese comparativa" + Tabela 2 (p. 51-52).
-> "KNighter relata dentre 37 *checkers* plausíveis, foram relatados 92 novos *bugs*, que depois de uma inspeção manual, 32,2% foram falsos positivos." (2.3.1, p. 46)
-> "Resultados de Hou et al. criaram 41 regras válidas comparadas com as 37 geradas por Yang et al." (2.3.2, p. 48)
-> "O agente [RepoAudit] [...] totalizando 40 verdadeiros positivos e 11 falsos positivos, uma precisão de 78,43%." (2.3.3, p. 50)
+**No TCC:** Seção 2.3 "Trabalhos correlatos" (p. 44-53): 2.3.1 KNighter (p. 45-47), 2.3.2 Hou et al. (p. 47-50), 2.3.3 RepoAudit (p. 50-52), 2.3.4 "Síntese comparativa" + Tabela 2 (p. 52-53).
+> "Dos 37 *checkers* plausíveis, o agente de triagem classificou 90 relatórios como *bug*; após verificação manual, 61 eram verdadeiros positivos, o que corresponde a uma taxa de falsos positivos de 32,2%." (2.3.1, p. 47)
+> "Resultados de Hou et al. criaram 41 regras válidas comparadas com as 37 geradas por Yang et al." (2.3.2, p. 49)
+> "O agente [RepoAudit] [...] totalizando 40 verdadeiros positivos e 11 falsos positivos, uma precisão de 78,43%." (2.3.3, p. 51)
 
 **Fala sugerida:**
-"Se a banca perguntar como isso se compara com a literatura: o KNighter foi pioneiro, gerando checkers para o Clang a partir de commits, mas tinha 32% de falsos positivos nos novos achados. O Hou et al. também sintetiza regras SemGrep e superou o KNighter em número de regras válidas. O RepoAudit é o mais sofisticado — um agente com memória — mas ele reconsulta o LLM a cada auditoria, o que tem custo recorrente. A diferença central do meu trabalho é que o LLM só atua na geração da regra; a execução final no SemGrep não tem custo de inferência nenhum."
+"Se a banca perguntar como isso se compara com a literatura: o KNighter foi pioneiro, gerando checkers para o Clang a partir de commits, mas 32% dos relatórios de bug dos checkers plausíveis eram falsos positivos. O Hou et al. também sintetiza regras SemGrep e superou o KNighter em número de regras válidas. O RepoAudit é o mais sofisticado — um agente com memória — mas ele reconsulta o LLM a cada auditoria, o que tem custo recorrente. A diferença central do meu trabalho é que o LLM só atua na geração da regra; a execução final no SemGrep não tem custo de inferência nenhum."
 
 ### O analisador de grafos de eventos
-**No TCC:** Seção 3.2.5 "O analisador de grafos de eventos: um componente complementar e determinístico" (p. 57-58).
-> "o analisador atingiu 134 dos 138 casos de CWE-416 do Juliet Test Suite, sem nenhum falso positivo, e manteve-se abaixo do limite de 0,1 alertas por KLOC [...] (entre eles *tmux*, *PostgreSQL* e *SQLite*), embora tenha falhado em outros (no *vim*, uma única função de liberação inferida incorretamente respondeu por 179 dos 234 alertas emitidos)." (3.2.5, p. 58)
+**No TCC:** Seção 3.2.5 "O analisador de grafos de eventos: um componente complementar e determinístico" (p. 59-60).
+> "o analisador atingiu 134 dos 138 casos de CWE-416 do Juliet Test Suite, sem nenhum falso positivo, e manteve-se abaixo do limite de 0,1 alertas por KLOC [...] (entre eles *tmux*, *PostgreSQL* e *SQLite*), embora tenha falhado em outros (no *vim*, uma única função de liberação inferida incorretamente respondeu por 179 dos 234 alertas emitidos)." (3.2.5, p. 60)
 
 **Fala sugerida:**
 "Esse é um componente que construí à parte, sem nenhum LLM, só para testar se uma abordagem totalmente determinística chegaria ao mesmo critério de qualidade. Ele constrói um grafo de eventos de memória por função e faz busca de alcançabilidade. Sozinho, ele acertou 134 dos 138 casos de CWE-416 do Juliet, sem nenhum falso positivo, e passou no critério de ruído real em projetos como tmux, PostgreSQL e SQLite — mas falhou no vim, porque inferiu errado uma função de liberação. Também usei os achados dele como exemplo para o gerador, mas isso é outra história, está no texto."
 
 ### Formatos de regra e combinações de modelo
-**No TCC:** Seção 3.2.4 "Formatos de saída das regras" (p. 57) + Seção 3.2.6 "Combinações de modelos avaliadas" (p. 58-59) + Tabela 3 (p. 59) + Seção 3.4.2 "Mecanismo `field_correct`: um ganho real, porém inconsistente" (p. 63), para o detalhe do `field_correct`.
-> "cinco formatos distintos de saída foram implementados [...]: `yaml` [...] `spec` [...] `template` [...] `form` [...] `formsearch`." (3.2.4, p. 57)
-> "a combinação D [...] demonstrou-se necessária para a obtenção dos melhores resultados [...]; a combinação C, baseada em um modelo de 4 bilhões de parâmetros, não foi capaz de reproduzir os ganhos obtidos pelo mecanismo `field_correct`." (3.2.6, p. 59)
+**No TCC:** Seção 3.2.4 "Formatos de saída das regras" (p. 58-59) + Seção 3.2.6 "Combinações de modelos avaliadas" (p. 60-61) + Tabela 3 (p. 61) + Seção 3.4.2 "Mecanismo `field_correct`: um ganho real, porém inconsistente" (p. 65), para o detalhe do `field_correct`.
+> "cinco formatos distintos de saída foram implementados [...]: `yaml` [...] `spec` [...] `template` [...] `form` [...] `formsearch`." (3.2.4, p. 58)
+> "a combinação D [...] demonstrou-se necessária para a obtenção dos melhores resultados [...]; a combinação C, baseada em um modelo de 4 bilhões de parâmetros, não foi capaz de reproduzir os ganhos obtidos pelo mecanismo `field_correct`." (3.2.6, p. 61)
 
 **Fala sugerida:**
 "Testei cinco formatos de saída, do mais livre (YAML puro) ao mais restrito (formsearch, com gramática formal). E testei seis combinações de modelo, de 3 bilhões a 30 bilhões de parâmetros. O ponto principal: um modelo de 4 bilhões roda localmente e funciona, mas só o modelo de 30 bilhões conseguiu aproveitar o mecanismo de correção mais refinado, o field_correct."
 
 ### Contribuições (Design Science Research)
-**No TCC:** Seção 4.2 "Contribuições para a Computação" (p. 75), itens (1)-(4).
-> "(1) **Constructo**: a caracterização [...] dos cinco formatos de saída de regra [...]. (2) **Método**: o mecanismo de correção por campo [...]. (3) **Modelo**: a demonstração empírica [...] de que a variação amostral entre sementes pode exceder o efeito de qualquer mecanismo experimental avaliado. (4) **Instanciação**: o *pipeline* completo e executável." (4.2, p. 75)
+**No TCC:** Seção 4.2 "Contribuições para a Computação" (p. 78-79), itens (1)-(4).
+> "(1) **Constructo**: a caracterização [...] dos cinco formatos de saída de regra [...]. (2) **Método**: o mecanismo de correção por campo [...]. (3) **Modelo**: a demonstração empírica [...] de que a variação amostral entre sementes pode exceder o efeito de qualquer mecanismo experimental avaliado. (4) **Instanciação**: o *pipeline* completo e executável." (4.2, p. 78)
 
 **Fala sugerida:**
 "Organizei as contribuições nos quatro tipos de artefato do DSR: um constructo (a caracterização dos cinco formatos de regra), um método (a caracterização do field_correct como ganho condicional), um modelo (a evidência de que a variação entre sementes pode superar qualquer efeito experimental) e uma instanciação (o pipeline completo, que roda em hardware de consumo)."

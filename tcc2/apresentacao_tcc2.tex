@@ -186,14 +186,14 @@
 
 % ===============================================================
 % Orçamento de tempo (alvo: ~20 minutos)
-%   - Problema e motivação .......... ~3 min   (2 slides)
-%   - Ferramentas utilizadas ......... ~2,5 min (3 slides: SemGrep, exemplo
-%                                                 de regra, Juliet)
-%   - Trabalhos relacionados ......... ~2 min   (2 slides: resumo dos três
+%   - Problema e motivação .......... ~1,5 min (1 slide)
+%   - Ferramentas utilizadas ......... ~3,75 min (4 slides: SemGrep, exemplo
+%                                                 de regra, Juliet, pergunta de pesquisa)
+%   - Trabalhos relacionados ......... ~1,75 min (2 slides: resumo dos três
 %                                                 trabalhos, comparação)
 %   - Objetivos e método ............ ~2,5 min (3 slides: objetivos, arquitetura
 %                                                 em tópicos, arquitetura em diagrama)
-%   - Resultados ..................... ~11,5 min (12 slides, incl. 7 slides
+%   - Resultados ..................... ~11,25 min (12 slides, incl. 7 slides
 %                                                 de vocabulário: formato+
 %                                                 combo, nossas combinações,
 %                                                 por que detector pequeno/
@@ -204,7 +204,7 @@
 %                                                 do teste isolado do Juliet)
 %   - Conclusão ...................... ~1,5 min (1 slide)
 % Capa + roteiro + encerramento não entram nesse orçamento.
-% Soma atual dos blocos: ~23 min (acima do alvo de ~20; enxugar se preciso).
+% Soma atual dos blocos: ~22 min (acima do alvo de ~20; enxugar se preciso).
 % Referencial teórico em profundidade, o detalhe de cada trabalho
 % correlato, o detalhamento fino de formatos de regra/combos de modelo
 % e o cronograma ficam no apêndice (sem tempo fixo -- usar apenas se
@@ -307,7 +307,7 @@
 % ---------------------------------------------------------------
 \begin{frame}{Trabalhos relacionados}
   \begin{itemize}
-    \item \textbf{KNighter} (Yang et al., SOSP 2025): a partir de \textit{commits} de correção, gera \textit{checkers} para o Clang Static Analyzer; 37 \textit{checkers} plausíveis relataram 92 novos \textit{bugs}, com 32,2\% de falsos positivos após inspeção manual.
+    \item \textbf{KNighter} (Yang et al., SOSP 2025): a partir de \textit{commits} de correção, gera \textit{checkers} para o Clang Static Analyzer; 92 novos \textit{bugs} no \textit{kernel} do Linux, e 32,2\% de falsos positivos nos relatórios dos 37 \textit{checkers} plausíveis.
     \item \textbf{Hou et al.} (QRS 2025): gera, migra e otimiza regras do \textbf{SemGrep} por \textit{few-shot learning}; 41 regras válidas contra 37 do KNighter.
     \item \textbf{RepoAudit} (Guo et al., ICML 2025): agente autônomo que audita repositórios inteiros; precisão de 78,43\% (40 verdadeiros e 11 falsos positivos), mas o modelo é consultado a cada auditoria (US\$ 2,54 por projeto).
   \end{itemize}
@@ -322,7 +322,7 @@
   \textbf{Trabalho} & \textbf{Papel do LLM} & \textbf{Motor} & \textbf{Limitação apontada} \\
   \midrule
   KNighter & Sintetiza verificadores a partir de \textit{commits} & \mbox{Clang Static Analyzer} & Restrito a C/C++; falsos positivos em lógica de estado complexa \\
-  Hou et al. & Gera, otimiza e migra regras & SemGrep & Muitos falsos positivos; dificuldade com fluxo de dados \\
+  Hou et al. & Gera, otimiza e migra regras & SemGrep & Depende da capacidade do LLM; amostra de verificação limitada; intervenção humana por iteração \\
   RepoAudit & Audita o repositório (agente com memória e validadores) & Claude 3.5 Sonnet + \textit{tree-sitter} & Custo a cada auditoria; análise limitada a cadeias de quatro funções \\
   \midrule
   \textbf{Este trabalho} & Gera e corrige a regra, com exemplos do Juliet & SemGrep & Limites da linguagem de regras do SemGrep (CWE-401, 415 e 476) \\
@@ -409,6 +409,7 @@
 \begin{frame}{Nossas combinações de modelo}
   \footnotesize
   \begin{table}
+  \scriptsize
   \begin{tabular}{cp{9cm}}
   \toprule
   \textbf{Combo} & \textbf{Modelo gerador/corretor} \\
@@ -418,17 +419,18 @@
   C & Qwen3-4B-Instruct-2507 \\
   D & Qwen3-Coder-30B-A3B (\textit{MoE}, $\sim$3B parâmetros ativos/\textit{token}) \\
   E & Qwen3-Coder-30B-A3B, sem troca de modelos entre papéis \\
+  F & Phi-4-mini \\
   \bottomrule
   \end{tabular}
   \end{table}
-  \vspace{-0.1cm}
+  \vspace{-0.3cm}
   \begin{itemize}
     \item Todas usam o mesmo modelo de detecção inicial (Qwen2.5-Coder-3B); variam só o gerador/corretor.
     \item Mantém custo baixo para a análise completa do projeto.
     \item Determinando áreas de possíveis \textit{bugs}.
     \item Combo D é do tipo \textit{Mixture-of-Experts}.
     \begin{itemize}
-      \item Entra uma fração pequena desses parâmetros entra em ação a cada token, cerca de 3 milhões.
+      \item Só uma fração pequena desses parâmetros entra em ação a cada \textit{token}: cerca de 3 bilhões.
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -468,7 +470,6 @@
     \item Efeito medido no CWE-416 (Combo D): 
     \begin{itemize}
       \item \textit{recall} sobe, mas a regra fica mais ruidosa, mais abrangente.
-      \item Limite da linguagem YAML.
     \end{itemize}
   \end{itemize}
   \begin{table}
@@ -484,7 +485,7 @@
   \bottomrule
   \end{tabular}
   \end{table}
-  \footnotesize Causa: o achado do grafo diz \textit{onde} está o defeito, mas não consegue acompanhar o fluxo de dados devidamente.
+  \footnotesize Causa: o achado do grafo diz \textit{onde} está o defeito, mas não instrui o modelo a excluir a própria linha de liberação do padrão de uso.
   \vfill
   {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}).\par}
 \end{frame}
@@ -503,12 +504,11 @@
 
 \begin{frame}{Síntese dos resultados por CWE: leitura}
   \begin{itemize}
-    \item Apenas o CWE-416 obteve aprovação consistente do \textit{gate} (2 de 5 sementes).
+    \item Apenas o CWE-416 teve dobras aprovadas pelo \textit{gate} (2 de 5 sementes, de forma instável).
     \item O CWE-415 chegou perto.
     \item \textit{Recall} é a média das 5 dobras por semente.
     \item A dobra do CWE-416 que passou no \textit{gate} teve 57\%, não o topo da faixa.
     \item Aprovação exige também $\leq$ 0,1 alertas/KLOC no git/git.
-    \item Fluxo de dados sendo complexo para YAML capturar.
   \end{itemize}
   \vfill
   {\tiny\itshape CWE-416: Uso Após Liberação -- CWE-415: Liberação Dupla.\par}
@@ -525,7 +525,7 @@
   415 & Combo D, \texttt{yaml}, \texttt{graph} & 43,3--76,3\% & 0 de 5 \\
   401 & execução isolada, sem validação cruzada & 79,47\% & -- \\
   476 & Combo D, \texttt{yaml}, \texttt{graph} & 22,9--24,8\% & 0 de 2 \\
-  457 & Combo C, \texttt{formsearch} & 0--18,75\% & 0 de 2 \\
+  457 & Combo C, \texttt{formsearch} & 0--5,0\% & 0 de 2 \\
   \bottomrule
   \end{tabular}
   \end{table}
@@ -553,6 +553,7 @@
     \item Mantendo apenas \texttt{guard}, deu o melhor resultado do trabalho.
     \item A dobra efetivamente aprovada teve 57\% de \textit{recall} e 0,03--0,04 alertas/KLOC.
     \item As dobras de \textit{recall} mais alto foram as que geraram ruído e reprovaram.
+    \item[] \scriptsize *Linha do meio: rodada de diagnóstico isolado, só 2 sementes; as demais usam 5.
   \end{itemize}
   \vspace{0.2cm}
   \vfill
@@ -572,7 +573,8 @@
   \end{center}
   \begin{itemize}
     \item Variação instável.
-    \item Nas primeiras interações gerou 63,8\% e 64,8\%.
+    \item Nas duas primeiras sementes: 63,8\% e 64,8\%.
+    \item A variação entre sementes pode exceder o efeito de qualquer mecanismo testado.
     \item Nunca aprovada pelo \textit{gate}: \textit{recall} $\geq$ 50\% \textbf{e} ruído real $\leq$ 0,1 alertas/KLOC, simultaneamente, nunca aconteceram juntos.
   \end{itemize}
   \vspace{0.1cm}
@@ -609,8 +611,8 @@
 \begin{frame}{O que não funcionou: um limite da linguagem, não da busca}
   \begin{itemize}
     \small
-    \item \textbf{CWE-457}: o motor \textit{Open Source} do SemGrep não inicia rastreamento de contaminação teto de \textit{recall} conhecido ($\approx$31\%), abaixo do piso do \textit{gate}.
-    \item \textbf{CWE-401} (vazamento): a condição é um argumento de vivacidade é algo muito mais rico do que o que uma regra de taint consegue expressar.
+    \item \textbf{CWE-457}: o motor \textit{Open Source} do SemGrep não inicia rastreamento de contaminação a partir de uma declaração sem valor -- teto de \textit{recall} conhecido ($\approx$31\%), abaixo do piso do \textit{gate}.
+    \item \textbf{CWE-401} (vazamento): a condição é um argumento de vivacidade sobre todos os caminhos da função -- algo mais rico do que uma regra de \textit{taint} consegue expressar.
     \item \textbf{CWE-415} (liberação dupla): fonte e sumidouro de contaminação são o \textbf{mesmo padrão} (\texttt{free(\$P)}); o motor de \textit{taint} casa a ocorrência contra si mesma.
     \item \textbf{CWE-476} (ponteiro nulo): a ausência de teste é uma condição sobre \textbf{caminhos}, não uma forma sintática única a excluir.
   \end{itemize}
@@ -631,9 +633,9 @@
     \item Objetivo 2 (comparação quantitativa) \textbf{parcialmente alcançado} (só CWE-416 e CWE-415 têm regra tradicional).
     \item Contribuição desse trabalho: distinguir um limite de \textbf{busca} de um limite da \textbf{linguagem-alvo} do SemGrep -- generalizável para além deste trabalho.
     \item Aprovação pelo \textit{gate} não garante alertas verdadeiros em código real -- revisão manual continua necessária.
-    \item \textbf{Próximos passos:} estender a validação de negativos do mundo real para além do \textit{git/git}; explorar motores com sensibilidade a caminho (CodeQL, Joern) para os CWEs sem solução.
+    \item \textbf{Próximos passos:} estender a validação de negativos do mundo real para além do \textit{git/git}; ampliar as medições de diagnóstico (critério do \textit{gate} que falha, cobertura por variante, classificação dos alertas); explorar motores com sensibilidade a caminho (CodeQL, Joern) para os CWEs sem solução.
   \end{itemize}
-  \vspace{-0.4cm}
+  \vspace{-0.8cm}
 \end{frame}
 
 \begin{frame}[plain]
