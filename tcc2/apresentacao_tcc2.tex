@@ -141,15 +141,18 @@
 % DADOS DA APRESENTAÇÃO (preencha)
 % ---------------------------------------------------------------
 \title[Síntese de regras SemGrep com LLMs]{Análise Estática Generativa com LLMs: Otimizando a Detecção de Vulnerabilidades no SemGrep via Abordagem Multi-Agente}
-\subtitle{Apresentação final --- TCC2}
+\subtitle{Apresentação final do TCC2}
 \author[Caio Xavier da Silva]{Caio Xavier da Silva}
 \institute[SENAC Santo Amaro]{%
-  SENAC --- Unidade Santo Amaro\\
+  SENAC, Unidade Santo Amaro\\
   Bacharelado em Ciência da Computação\\
   \footnotesize Orientador: Prof. Eduardo Heredia \\ Coorientador: Prof. Thyago Conchado Quintas}
 \date{São Paulo, 2026}
 
 % ===============================================================
+\newcommand{\fonte}[1]{{\tiny\itshape Fonte: #1\par}}
+\newcommand{\cit}[1]{{\scriptsize\itshape (#1)}}
+
 \begin{document}
 
 % ---------------------------------------------------------------
@@ -215,23 +218,26 @@
 \section{Problema e motivação}
 % ---------------------------------------------------------------
 \begin{frame}{O problema}
+  \footnotesize
   \begin{itemize}
     \item Uma falta de checagem de tamanho no OpenSSL causou o \textit{Heartbleed} (CVE-2014-0160).
     \item Acesso a senhas, dados pessoais e chaves criptográficas.
-    \item Entre 24\% e 55\% dos servidores HTTPS mais acessados do mundo ficaram vulneráveis.
+    \item Entre 24\% e 55\% dos servidores HTTPS mais acessados do mundo ficaram vulneráveis. \cit{Durumeric et al., 2014}
     \begin{itemize} 
-      \item Como: Yahoo, Stack Overflow e a Receita Federal do Canadá.
+      \item Entre elas: Yahoo \cit{Wilhelm, 2014} e a Receita Federal do Canadá \cit{Williams, 2014}.
     \end{itemize}
-    \item 70\% de vulnerabilidades críticas da Microsoft e Chromium.
+    \item 70\% de vulnerabilidades críticas da Microsoft e Chromium. \cit{Thomas, 2019; Chromium, 2020}
     \begin{itemize}
       \item Erros de segurança de memória. 
     \end{itemize}
-    \item Análise estática tradicional depende de regras rígidas e manuais.
-    \item Submeter o código inteiro a um LLM: 
+    \item Análise estática tradicional depende de regras rígidas e manuais. \cit{Hou et al., 2025}
+    \item Submeter o código inteiro a um LLM \cit{Hou et al., 2025}: 
     \begin{itemize}
       \item Dezenas de milhões de \textit{tokens}, dias de processamento e risco de alucinação.
     \end{itemize}
   \end{itemize}
+  \vfill
+  \fonte{Durumeric et al. (2014); Wilhelm (2014); Williams (2014); Thomas (2019); Chromium Projects (2020); Hou et al. (2025). TCC, Seção 1.1.}
 \end{frame}
 
 % ---------------------------------------------------------------
@@ -240,27 +246,24 @@
 \begin{frame}{Ferramenta: SemGrep}
   \footnotesize
   \begin{itemize}
-    \item Analisador estático de código aberto.
+    \item Analisador estático de código aberto. \cit{Hou et al., 2025}
     \begin{itemize}
       \footnotesize
-      \item Regras em YAML; padrões que imitam sintaxe;
-      \item Contrário do CodeQL, tratando como banco de dados;
+      \item Regras em YAML; padrões que imitam sintaxe; \cit{Hou et al., 2025}
+      \item Contrário do CodeQL, tratando como banco de dados; \cit{Hou et al., 2025}
     \end{itemize}
-    \item Converte o código em uma árvore de sintaxe abstrata universal (UAST)
-    \item Com \textit{pattern-matching} uniforme em mais de 30 linguagens.
+    \item Converte o código em uma árvore de sintaxe abstrata universal (UAST) \cit{Hou et al., 2025}
+    \item Com \textit{pattern-matching} uniforme em mais de 30 linguagens. \cit{Hou et al., 2025}
     \item \textbf{Metavariáveis} (\texttt{\$VAR}) capturam um valor e exigem reuso idêntico;
     \item \textbf{Reticências} (\texttt{...}) abstraem qualquer trecho irrelevante do padrão.
-    \item Modo \textit{taint}: declara área no código(\textit{sink}) e se rastreia o fluxo de dados.
-    \begin{itemize}
-      \footnotesize
-      \item Ao contrário de padrões estáticos.
-    \end{itemize}
-    \item Possuem \textit{ruleset} público/comunitário -- é esse conjunto que este trabalho chama de ``regra tradicional''.
+    \item Modo \textit{taint}: rastreia um dado da \textbf{fonte} ao \textbf{sumidouro}, em vez de casar um padrão isolado (próximo slide).
+    \item Possuem \textit{ruleset} público/comunitário, e é esse conjunto que este trabalho chama de ``regra tradicional''.
     \item Apenas a \textbf{CWE-416} e \textbf{CWE-415} têm regra tradicional direta no pacote \texttt{r/c}.
   \end{itemize}
-  \vspace{-0.2cm}
+  \vspace{-0.33cm}
   \vfill
   {\tiny\itshape CWE-416: uso após liberação (\textit{use-after-free}); CWE-415: liberação dupla (\textit{double-free}).\par}
+  \fonte{Hou et al. (2025); Jiang et al. (2025). TCC, Seção 2.2.1.6.}
 \end{frame}
 
 \begin{frame}{Exemplo de regra SemGrep}
@@ -271,12 +274,38 @@
   \footnotesize Regra que identifica uma senha embutida como valor padrão de um argumento, em Python; o predicado \texttt{pattern-not} exclui o caso em que a senha está vazia.
   \vspace{-0.05cm}
 
-  {\scriptsize\itshape Fonte: adaptado de Hou et al. (2025) -- mesma figura do TCC (Seção 1.1).\par}
+  {\scriptsize\itshape Fonte: adaptado de Hou et al. (2025), mesma figura do TCC (Seção 1.1).\par}
+\end{frame}
+
+\begin{frame}{Modo \textit{taint}: como o SemGrep rastreia um dado}
+  \footnotesize
+  \begin{columns}[T]
+    \column{0.52\textwidth}
+    \begin{itemize}
+      \item \textbf{Fonte}: onde o dado passa a ser ``contaminado''.
+      \item \textbf{Sumidouro}: onde o uso desse dado é perigoso; o alerta sai aqui.
+      \item \textbf{Desinfetante}: onde a contaminação termina. \cit{Semgrep, 2026c}
+      \item A contaminação se propaga por atribuições, operadores e chamadas.
+      \item \texttt{by-side-effect}: a própria variável fica contaminada, como em \texttt{free(p)}. \cit{Semgrep, 2026a}
+    \end{itemize}
+    \column{0.45\textwidth}
+    \begin{block}{CWE-416 (uso após liberação)}
+      {\ttfamily\scriptsize
+      free(p);\hfill{\rmfamily\itshape fonte}\\
+      ...\\
+      p->campo = 1;\hfill{\rmfamily\itshape sumidouro: alerta}\\[5pt]
+      free(p);\hfill{\rmfamily\itshape fonte}\\
+      p = NULL;\hfill{\rmfamily\itshape desinfetante}\\
+      p->campo = 1;\hfill{\rmfamily\itshape sem alerta}\par}
+    \end{block}
+  \end{columns}
+  \vfill
+  \fonte{Semgrep (2026a; 2026c). TCC, Seção 2.2.1.7.}
 \end{frame}
 
 \begin{frame}{Ferramenta: Juliet Test Suite}
   \begin{itemize}
-    \item Coleção de domínio público do NIST (SARD):
+    \item Coleção de domínio público do NIST (SARD) \cit{NSA CAS, 2017}:
     \begin{itemize}
       \item Possui milhares de casos de teste sintéticos em C/C++ e Java, categorizada por CWE.
     \end{itemize} 
@@ -288,11 +317,13 @@
     \end{itemize}
     \item Alimenta o modo de exemplos \texttt{pairs} do gerador: mostrados como exemplo ao LLM.
   \end{itemize}
+  \vfill
+  \fonte{NSA Center for Assured Software (2017). TCC, Seção 2.2.5.1.}
 \end{frame}
 
 \begin{frame}{Pergunta de pesquisa}
   \begin{quote}
-    \itshape Um \textit{framework} multi-agente baseado em LLMs é capaz de sintetizar regras para o SemGrep que detectem vulnerabilidades em código C com \textit{recall} e precisão estatisticamente superiores aos do \textit{ruleset} tradicional da ferramenta?
+    \itshape Um \textit{framework} multi-agente baseado em LLMs é capaz de sintetizar regras para o SemGrep que detectem vulnerabilidades em código C com \textit{recall} e precisão consistentemente superiores aos do \textit{ruleset} tradicional da ferramenta?
   \end{quote}
   \vspace{0.3cm}
   \textbf{Escopo:} linguagem C, SemGrep como motor de execução, cinco CWEs de memória:
@@ -300,6 +331,8 @@
   \small CWE-401 (vazamento) \quad CWE-415 (liberação dupla) \quad CWE-416 (uso após liberação)\\
   CWE-457 (variável não inicializada) \quad CWE-476 (ponteiro nulo)
   \end{center}
+  \vfill
+  \fonte{TCC, Seção 1.2 (Formulação do problema).}
 \end{frame}
 
 % ---------------------------------------------------------------
@@ -307,10 +340,12 @@
 % ---------------------------------------------------------------
 \begin{frame}{Trabalhos relacionados}
   \begin{itemize}
-    \item \textbf{KNighter} (Yang et al., SOSP 2025): a partir de \textit{commits} de correção, gera \textit{checkers} para o Clang Static Analyzer; 92 novos \textit{bugs} no \textit{kernel} do Linux, e 32,2\% de falsos positivos nos relatórios dos 37 \textit{checkers} plausíveis.
-    \item \textbf{Hou et al.} (QRS 2025): gera, migra e otimiza regras do \textbf{SemGrep} por \textit{few-shot learning}; 41 regras válidas contra 37 do KNighter.
-    \item \textbf{RepoAudit} (Guo et al., ICML 2025): agente autônomo que audita repositórios inteiros; precisão de 78,43\% (40 verdadeiros e 11 falsos positivos), mas o modelo é consultado a cada auditoria (US\$ 2,54 por projeto).
+    \item \textbf{KNighter} (Yang et al., SOSP 2025): a partir de \textit{commits} de correção, gera \textit{checkers} para o Clang Static Analyzer; 92 novos \textit{bugs} no \textit{kernel} do Linux, e 32,2\% de falsos positivos nos relatórios dos 37 \textit{checkers} plausíveis. \cit{Yang et al., 2025}
+    \item \textbf{Hou et al.} (QRS 2025): gera, migra e otimiza regras do \textbf{SemGrep} por \textit{few-shot learning}; 41 regras válidas contra 37 do KNighter. \cit{Hou et al., 2025}
+    \item \textbf{RepoAudit} (Guo et al., ICML 2025): agente autônomo que audita repositórios inteiros; precisão de 78,43\% (40 verdadeiros e 11 falsos positivos), mas o modelo é consultado a cada auditoria (US\$ 2,54 por projeto). \cit{Guo et al., 2025}
   \end{itemize}
+  \vfill
+  \fonte{Yang et al. (2025); Hou et al. (2025); Guo et al. (2025). TCC, Seção 2.3.}
 \end{frame}
 
 \begin{frame}{Trabalhos relacionados: o que este trabalho muda}
@@ -325,15 +360,17 @@
   Hou et al. & Gera, otimiza e migra regras & SemGrep & Depende da capacidade do LLM; amostra de verificação limitada; intervenção humana por iteração \\
   RepoAudit & Audita o repositório (agente com memória e validadores) & Claude 3.5 Sonnet + \textit{tree-sitter} & Custo a cada auditoria; análise limitada a cadeias de quatro funções \\
   \midrule
-  \textbf{Este trabalho} & Gera e corrige a regra, com exemplos do Juliet & SemGrep & Limites da linguagem de regras do SemGrep (CWE-401, 415 e 476) \\
+  \textbf{Este trabalho} & Gera e corrige a regra, com exemplos do Juliet & SemGrep & Limites do SemGrep: linguagem (CWE-401 e 476) e motor \textit{taint} (CWE-415 e 457) \\
   \bottomrule
   \end{tabular}
   \end{table}
   \vspace{0.1cm}
   \begin{itemize}
-    \item O LLM atua só na geração da regra; a execução no SemGrep não tem custo de inferência -- contraste com o RepoAudit.
-    \item Exemplos vêm do Juliet (pares vulnerável/seguro), e não de histórico de \textit{commits}.
+    \item LLM só na geração da regra; execução no SemGrep sem custo de inferência (contraste com o RepoAudit).
+    \item Exemplos do Juliet (pares vulnerável/seguro), e não de histórico de \textit{commits}.
   \end{itemize}
+  \vfill
+  \fonte{Yang et al. (2025); Hou et al. (2025); Guo et al. (2025). TCC, Seção 2.3.4 (Tabela 2).}
 \end{frame}
 
 % ---------------------------------------------------------------
@@ -351,7 +388,9 @@
   \end{enumerate}
   \vspace{0.2cm}
 
-  \textbf{Hipótese:} o modelo automatizado detecta vulnerabilidades com taxas estatisticamente superiores às abordagens tradicionais.
+  \textbf{Hipótese:} o modelo automatizado detecta vulnerabilidades com taxas consistentemente superiores às abordagens tradicionais.
+  \vfill
+  \fonte{TCC, Seção 1.3.}
 \end{frame}
 
 \begin{frame}{Arquitetura implementada}
@@ -369,6 +408,8 @@
       \item Número que define o sorteio do Juliet Test Suite para a validação.
     \end{itemize}
   \end{itemize}
+  \vfill
+  \fonte{Elaborado pelo autor (2026). TCC, Seções 3.2.3 e 3.2.7.}
 \end{frame}
 
 \begin{frame}{Arquitetura implementada: fluxo}
@@ -392,6 +433,7 @@
   \end{tikzpicture}
   \vfill
   \end{center}
+  \fonte{Elaborado pelo autor (2026). TCC, Seção 3.2.3 (Figura 12).}
 \end{frame}
 
 % ---------------------------------------------------------------
@@ -400,10 +442,12 @@
 \begin{frame}{Antes dos números: formato e combinação de modelo}
   \begin{itemize}
     \item \textbf{Formato de saída} (liberdade do modelo gerador): \texttt{yaml} $>$ \texttt{spec} $>$ \texttt{template} $>$ \texttt{form} $>$ \texttt{formsearch}.
-    \item \textbf{Combinação de modelo} (\textit{combo}): define o(s) LLM(s) usados como gerador/corretor -- Combo D usa um modelo de 30B (\textit{Mixture-of-Experts}); Combo C, um modelo de 4B.
+    \item \textbf{Combinação de modelo} (\textit{combo}): define o(s) LLM(s) usados como gerador/corretor: o Combo D usa um modelo de 30B (\textit{Mixture-of-Experts}); o Combo C, um modelo de 4B.
   \end{itemize}
   \vspace{0.2cm}
   \textit{\footnotesize Leitura: ``Combo D, \texttt{template}'' = modelo de 30B, formato \texttt{template}.}
+  \vfill
+  \fonte{Elaborado pelo autor (2026). TCC, Seções 3.2.4 e 3.2.6.}
 \end{frame}
 
 \begin{frame}{Nossas combinações de modelo}
@@ -433,6 +477,9 @@
       \item Só uma fração pequena desses parâmetros entra em ação a cada \textit{token}: cerca de 3 bilhões.
     \end{itemize}
   \end{itemize}
+  \vspace{-0.10cm}
+  \vfill
+  \fonte{Elaborado pelo autor (2026). TCC, Seção 3.2.6 (Tabela 3).}
 \end{frame}
 
 \begin{frame}{Modo de exemplos: \texttt{findings} (padrão)}
@@ -445,6 +492,8 @@
     \item Foi o modo padrão, usado nas primeiras rodadas experimentais, antes de qualquer alternativa ser testada.
     \item Limitação observada: a descrição é apenas textual, não apontando as linhas exatas do código envolvidas no defeito.
   \end{itemize}
+  \vfill
+  \fonte{Elaborado pelo autor (2026). TCC, Seção 3.2.3.}
 \end{frame}
 
 \begin{frame}{Modo de exemplos: \texttt{pairs}}
@@ -459,6 +508,7 @@
   \end{itemize}
   \vfill
   {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}).\par}
+  \fonte{Elaborado pelo autor (2026), com pares do Juliet (NSA CAS, 2017). TCC, Seção 3.2.3.}
 \end{frame}
 
 \begin{frame}{Modo de exemplos: \texttt{graph}}
@@ -486,8 +536,10 @@
   \end{tabular}
   \end{table}
   \footnotesize Causa: o achado do grafo diz \textit{onde} está o defeito, mas não instrui o modelo a excluir a própria linha de liberação do padrão de uso.
+  \vspace{-0.14cm}
   \vfill
   {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}).\par}
+  \fonte{Elaborado pelo autor (2026). TCC, Seções 3.2.5 e 3.4.5 (Tabela 7).}
 \end{frame}
 
 \begin{frame}{Mecanismos do corretor: \texttt{guard} e \texttt{project\_apis}}
@@ -500,6 +552,7 @@
   \textit{\footnotesize Leitura: ``\texttt{pairs+guard}'' = modo de exemplos \texttt{pairs} com o mecanismo \texttt{guard} ativo.}
   \vfill
   {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}).\par}
+  \fonte{Elaborado pelo autor (2026). TCC, Seção 3.2.3.}
 \end{frame}
 
 \begin{frame}{Síntese dos resultados por CWE: leitura}
@@ -511,7 +564,8 @@
     \item Aprovação exige também $\leq$ 0,1 alertas/KLOC no git/git.
   \end{itemize}
   \vfill
-  {\tiny\itshape CWE-416: Uso Após Liberação -- CWE-415: Liberação Dupla.\par}
+  {\tiny\itshape CWE-416: Uso Após Liberação; CWE-415: Liberação Dupla.\par}
+  \fonte{Elaborado pelo autor (2026). TCC, Seção 3.4 (Tabela 4).}
 \end{frame}
 
 \begin{frame}{Síntese dos resultados por CWE}
@@ -523,14 +577,15 @@
   \midrule
   416 & Combo D, \texttt{template}, \texttt{pairs+guard} & 89,2--100\% & 2 de 5 sementes \\
   415 & Combo D, \texttt{yaml}, \texttt{graph} & 43,3--76,3\% & 0 de 5 \\
-  401 & execução isolada, sem validação cruzada & 79,47\% & -- \\
+  401 & Combo D, \texttt{yaml}, \texttt{graph} & 25,2--25,7\% & 0 de 2 \\
   476 & Combo D, \texttt{yaml}, \texttt{graph} & 22,9--24,8\% & 0 de 2 \\
   457 & Combo C, \texttt{formsearch} & 0--5,0\% & 0 de 2 \\
   \bottomrule
   \end{tabular}
   \end{table}
   \vfill
-  {\tiny\itshape CWE-416: Uso Após Liberação -- CWE-415: Liberação Dupla -- CWE-401: Vazamento -- CWE-476: Ponteiro Nulo -- CWE-457: Var. Não Inicializada.\par}
+  {\tiny\itshape CWE-416: Uso Após Liberação; CWE-415: Liberação Dupla; CWE-401: Vazamento; CWE-476: Ponteiro Nulo; CWE-457: Var. Não Inicializada.\par}
+  \fonte{Elaborado pelo autor (2026). TCC, Seção 3.4 (Tabela 4).}
 \end{frame}
 
 \begin{frame}{CWE-416: evolução até a melhor configuração}
@@ -558,6 +613,7 @@
   \vspace{0.2cm}
   \vfill
   {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}).\par}
+  \fonte{Elaborado pelo autor (2026). TCC, Seção 3.4.3 (Tabela 5).}
 \end{frame}
 
 \begin{frame}{CWE-415: a lição metodológica das sementes}
@@ -574,12 +630,13 @@
   \begin{itemize}
     \item Variação instável.
     \item Nas duas primeiras sementes: 63,8\% e 64,8\%.
-    \item A variação entre sementes pode exceder o efeito de qualquer mecanismo testado.
+    \item Em casos específicos, a variação entre sementes supera o efeito de um mecanismo isolado.
     \item Nunca aprovada pelo \textit{gate}: \textit{recall} $\geq$ 50\% \textbf{e} ruído real $\leq$ 0,1 alertas/KLOC, simultaneamente, nunca aconteceram juntos.
   \end{itemize}
   \vspace{0.1cm}
   \vfill
   {\tiny\itshape CWE-415: Liberação Dupla (\textit{Double Free}).\par}
+  \fonte{Elaborado pelo autor (2026). TCC, Seção 3.4.4 (Tabela 6).}
 \end{frame}
 
 \begin{frame}{CWE-416: a regra sintetizada supera a tradicional}
@@ -605,20 +662,43 @@
   \end{itemize}
   \vspace{0.1cm}
   \vfill
-  {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}) -- CWE-415: Liberação Dupla (\textit{Double Free}).\par}
+  {\tiny\itshape CWE-416: Uso Após Liberação (\textit{Use After Free}); CWE-415: Liberação Dupla (\textit{Double Free}).\par}
+  \fonte{Elaborado pelo autor (2026). TCC, Seção 3.4.6 (Tabela 9); regra \texttt{r/c} do registro público do SemGrep.}
 \end{frame}
 
-\begin{frame}{O que não funcionou: um limite da linguagem, não da busca}
+\begin{frame}{Dois tipos de limite do SemGrep}
+  \footnotesize
+  \begin{center}
+  \begin{tabular}{p{1.8cm}p{5.4cm}p{5.4cm}}
+  \toprule
+   & \textbf{Limite da linguagem de padrões} & \textbf{Limite do motor de \textit{taint}} \\
+  \midrule
+  Pergunta & É possível \textit{escrever} a condição da vulnerabilidade? & O motor consegue \textit{calcular} a condição já escrita? \\
+  Natureza & Expressividade: formas de código e relações entre pontos nomeados & Capacidade de análise: uma função, sem sensibilidade a caminho, sem análise de ponteiros \cit{Semgrep, 2026b} \\
+  No TCC & CWE-401 (vivacidade) e CWE-476 (ausência de teste) & CWE-457 (declaração sem valor) e CWE-415 (laços, funções) \\
+  Saída & Outro formalismo (CodeQL, Joern, grafo) & Outro modo (busca) ou edição (\textit{Pro}) \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  \begin{itemize}
+    \item Teste: escrever a regra \textbf{à mão}. Se não dá para escrever, o limite é da linguagem; se escreve e o alerta não sai (ou sai demais), é do motor.
+  \end{itemize}
+  \vfill
+  \fonte{Semgrep (2026a; 2026b). TCC, Seção 2.2.1.7.}
+\end{frame}
+
+\begin{frame}{Não funcionou: limites do SemGrep, não da busca}
   \begin{itemize}
     \small
-    \item \textbf{CWE-457}: o motor \textit{Open Source} do SemGrep não inicia rastreamento de contaminação a partir de uma declaração sem valor -- teto de \textit{recall} conhecido ($\approx$31\%), abaixo do piso do \textit{gate}.
-    \item \textbf{CWE-401} (vazamento): a condição é um argumento de vivacidade sobre todos os caminhos da função -- algo mais rico do que uma regra de \textit{taint} consegue expressar.
-    \item \textbf{CWE-415} (liberação dupla): fonte e sumidouro de contaminação são o \textbf{mesmo padrão} (\texttt{free(\$P)}); o motor de \textit{taint} casa a ocorrência contra si mesma.
+    \item \textbf{CWE-457}: o motor \textit{Open Source} do SemGrep não inicia rastreamento de contaminação a partir de uma declaração sem valor, com teto de \textit{recall} conhecido ($\approx$31\%), abaixo do piso do \textit{gate}.
+    \item \textbf{CWE-401} (vazamento): a condição é um argumento de vivacidade sobre todos os caminhos da função, algo mais rico do que uma regra de \textit{taint} consegue expressar.
+    \item \textbf{CWE-415} (liberação dupla): a condição \textbf{é expressável} (\texttt{by-side-effect: only}); o motor de \textit{taint} limita o \textit{recall} a 41,9\% e emite 0,67 alertas/KLOC (limite: 0,1).
     \item \textbf{CWE-476} (ponteiro nulo): a ausência de teste é uma condição sobre \textbf{caminhos}, não uma forma sintática única a excluir.
   \end{itemize}
   \vspace{0.02cm}
   \vfill
-  {\tiny\itshape CWE-457: Variável Não Inicializada -- CWE-401: Vazamento de Memória -- CWE-415: Liberação Dupla -- CWE-476: Ponteiro Nulo.\par}
+  {\tiny\itshape CWE-457: Variável Não Inicializada; CWE-401: Vazamento de Memória; CWE-415: Liberação Dupla; CWE-476: Ponteiro Nulo.\par}
+  \fonte{Elaborado pelo autor (2026). TCC, Seções 3.4.1, 3.4.5 (itens iv a vi; Tabela 8) e 3.4.8.}
 \end{frame}
 
 % ---------------------------------------------------------------
@@ -627,15 +707,17 @@
 \begin{frame}{Conclusão}
   \footnotesize
   \begin{itemize}
+    \setlength{\itemsep}{0pt}
     \item \textbf{Hipótese parcialmente confirmada}: refutada na forma ampla (nem todas as 5 categorias).
-    \item \textbf{Não refutada} no CWE-416, o único aprovado pelo \textit{gate}, onde a regra sintetizada superou a tradicional.
-    \item Objetivos 1 (limites semânticos) e 3 (viabilidade local) \textbf{alcançados}.
-    \item Objetivo 2 (comparação quantitativa) \textbf{parcialmente alcançado} (só CWE-416 e CWE-415 têm regra tradicional).
-    \item Contribuição desse trabalho: distinguir um limite de \textbf{busca} de um limite da \textbf{linguagem-alvo} do SemGrep -- generalizável para além deste trabalho.
-    \item Aprovação pelo \textit{gate} não garante alertas verdadeiros em código real -- revisão manual continua necessária.
-    \item \textbf{Próximos passos:} estender a validação de negativos do mundo real para além do \textit{git/git}; ampliar as medições de diagnóstico (critério do \textit{gate} que falha, cobertura por variante, classificação dos alertas); explorar motores com sensibilidade a caminho (CodeQL, Joern) para os CWEs sem solução.
+    \item \textbf{Não refutada} no CWE-416, único aprovado pelo \textit{gate}, onde superou a regra tradicional.
+    \item Objetivos 1 (limites semânticos) e 3 (viabilidade local) \textbf{plenamente alcançados}; Objetivo 2 (comparação quantitativa) \textbf{parcialmente} (só CWE-416 e CWE-415 têm regra tradicional).
+    \item Contribuição: distinguir um limite de \textbf{busca} de um da \textbf{linguagem-alvo} do SemGrep (generalizável).
+    \item Aprovação pelo \textit{gate} não garante alertas verdadeiros: a revisão manual continua necessária.
+    \item \textbf{Próximos passos:} estender a validação de negativos do mundo real para além do \textit{git/git}; aprofundar o diagnóstico (classificar os alertas do \textit{git/git}, custo em \textit{tokens}); motores sensíveis a caminho (CodeQL, Joern) para os CWEs sem solução.
   \end{itemize}
-  \vspace{-0.8cm}
+  \vspace{0cm}
+  \vfill
+  \fonte{Elaborado pelo autor (2026). TCC, Capítulo 4 (Seções 4.1 a 4.3).}
 \end{frame}
 
 \begin{frame}[plain]
